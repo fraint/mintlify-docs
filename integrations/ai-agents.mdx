@@ -1,0 +1,610 @@
+---
+title: "Integrate Volink with AI Coding Agents and Tools"
+description: "Route AI coding agents through Volink with one API key. Covers Claude Code, Cline, Roo Code, Kilo Code, OpenClaw, Hermes, Codex CLI, OpenCode, Cursor, and Kiro."
+---
+
+Volink works with popular AI coding agents through its OpenAI-compatible and Anthropic-compatible APIs. Point any supported agent at your Volink base URL, authenticate with your Volink API key, and all model traffic routes through Volink — no per-agent accounts required.
+
+<AccordionGroup>
+
+  <Accordion title="Claude Code">
+    Claude Code connects to Volink through the Anthropic-compatible Messages API. Set three environment variables before starting the agent.
+
+    **Protocol:** Anthropic-compatible
+
+    <Steps>
+      <Step title="Install Claude Code">
+        If Claude Code is not yet installed, install it with npm:
+
+        ```bash
+        npm install -g @anthropic-ai/claude-code
+        ```
+      </Step>
+      <Step title="Set environment variables">
+        Export the following before running `claude`:
+
+        ```bash
+        export ANTHROPIC_BASE_URL="https://api.volink.org"
+        export ANTHROPIC_AUTH_TOKEN="your_volink_api_key"
+        export ANTHROPIC_MODEL="your_model_id"
+        claude
+        ```
+
+        Use `ANTHROPIC_AUTH_TOKEN` — Claude Code sends it as the `Authorization: Bearer` header, which matches Volink's Anthropic-compatible endpoint. Replace `your_model_id` with a model enabled in your Volink account.
+      </Step>
+      <Step title="Persist the configuration (optional)">
+        To avoid exporting variables every session, add them to a `settings.json` file:
+
+        ```json
+        {
+          "env": {
+            "ANTHROPIC_BASE_URL": "https://api.volink.org",
+            "ANTHROPIC_AUTH_TOKEN": "your_volink_api_key",
+            "ANTHROPIC_MODEL": "your_model_id"
+          }
+        }
+        ```
+
+        Claude Code reads settings from these locations:
+
+        - User settings: `~/.claude/settings.json`
+        - Project settings: `.claude/settings.json`
+        - Local project settings: `.claude/settings.local.json`
+
+        Use user settings for personal setup. Use project settings only when the whole team should share the same Volink routing. Do not commit real API keys to a repository.
+      </Step>
+      <Step title="Add a custom model picker entry (optional)">
+        If your Volink model ID does not appear in Claude Code's model picker, expose it with:
+
+        ```bash
+        export ANTHROPIC_CUSTOM_MODEL_OPTION="your_model_id"
+        export ANTHROPIC_CUSTOM_MODEL_OPTION_NAME="Volink"
+        export ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION="Volink Anthropic-compatible model"
+        ```
+
+        You can also place these values under the `env` key in `settings.json`.
+      </Step>
+      <Step title="Verify">
+        Run a quick prompt from your project directory:
+
+        ```bash
+        claude -p "Reply with one short sentence confirming Volink is connected."
+        ```
+
+        A successful reply confirms Claude Code is routing through Volink.
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Claude Code still uses your Claude subscription.** Confirm `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` are exported in the same shell session where you run `claude`. Run `echo "$ANTHROPIC_BASE_URL"` and `echo "$ANTHROPIC_AUTH_TOKEN"` to verify.
+    - **Authentication fails.** Check that the API key is a valid Volink key with no extra spaces. If you used `ANTHROPIC_API_KEY` instead of `ANTHROPIC_AUTH_TOKEN`, Claude Code sends the key as `X-Api-Key`; switch to `ANTHROPIC_AUTH_TOKEN` for consistent bearer authentication.
+    - **Model not found.** Confirm `ANTHROPIC_MODEL` exactly matches a model ID enabled in your Volink account. Model names are case-sensitive.
+    - **Requests time out.** Increase the API timeout and restart Claude Code from the same shell:
+
+      ```bash
+      export API_TIMEOUT_MS=600000
+      ```
+  </Accordion>
+
+  <Accordion title="Cline">
+    Cline connects to Volink through its OpenAI-compatible provider. Configure it in the VS Code UI or with the Cline CLI.
+
+    **Protocol:** OpenAI-compatible
+
+    <Tabs>
+      <Tab title="VS Code extension">
+        <Steps>
+          <Step title="Open Cline settings">
+            Open the Cline panel in VS Code, then click the gear icon to open settings.
+          </Step>
+          <Step title="Select provider">
+            Set **API Provider** to `OpenAI Compatible`.
+          </Step>
+          <Step title="Fill in provider fields">
+            Enter:
+
+            - **Base URL:** `https://api.volink.org/v1`
+            - **API key:** your Volink API key
+            - **Model:** a model ID enabled in your Volink account
+          </Step>
+          <Step title="Configure model metadata">
+            Open **Model Configuration** and set values that match the selected model:
+
+            - **Max Output Tokens** — use the model's supported output limit
+            - **Context Window** — use the model's supported context length
+            - **Image Support** — enable only for vision-capable models
+            - **Computer Use** — enable only when required by your workflow
+            - **Input Price / Output Price** — optional, for local cost estimates
+          </Step>
+          <Step title="Verify">
+            Click **Verify** if your Cline version shows that button, then start a new task and prompt:
+
+            ```text
+            Create a one-sentence summary of this project without changing files.
+            ```
+          </Step>
+        </Steps>
+      </Tab>
+      <Tab title="CLI">
+        <Steps>
+          <Step title="Authenticate">
+            Run the auth command with the `openai` provider ID:
+
+            ```bash
+            cline auth \
+              -p openai \
+              -k "$VOLINK_API_KEY" \
+              -b "https://api.volink.org/v1" \
+              -m "your_model_id"
+            ```
+          </Step>
+          <Step title="Verify">
+            ```bash
+            cline "What is 2 + 2?"
+            ```
+          </Step>
+        </Steps>
+      </Tab>
+    </Tabs>
+
+    **Troubleshooting**
+
+    - **Authentication error:** check that the API key is copied without spaces.
+    - **Model not found:** use the exact model ID from your Volink account.
+    - **Endpoint error:** confirm the base URL includes `/v1`.
+    - **Tool or edit failures:** confirm Cline permissions and workspace trust settings.
+    - **Verification fails but direct curl works:** check whether Cline has a stale model or context value in a separate model configuration field.
+  </Accordion>
+
+  <Accordion title="Roo Code">
+    Roo Code connects to Volink through its OpenAI-compatible provider settings in VS Code. Choose `OpenAI Compatible` rather than the plain `OpenAI` provider when configuring a custom endpoint.
+
+    **Protocol:** OpenAI-compatible
+
+    <Steps>
+      <Step title="Open Roo Code settings">
+        Open Roo Code in VS Code and navigate to its settings panel.
+      </Step>
+      <Step title="Select provider">
+        Select an OpenAI-compatible provider. If both `OpenAI` and `OpenAI Compatible` appear, choose `OpenAI Compatible` for Volink.
+      </Step>
+      <Step title="Fill in provider fields">
+        Enter:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model:** a Volink-enabled chat model ID
+
+        Use the same model ID for the main model and any lightweight model fields unless you intentionally want different routing.
+      </Step>
+      <Step title="Choose a capable model">
+        Roo Code relies on tools for file reading, command execution, and edits. Select a Volink model that supports tool and function calling for agentic workflows.
+      </Step>
+      <Step title="Verify">
+        Ask Roo Code to inspect the repository without editing files:
+
+        ```text
+        Summarize the project structure and do not make changes.
+        ```
+      </Step>
+    </Steps>
+
+    **Recommended settings**
+
+    - Choose a strong coding model for code edits and debugging.
+    - Enable streaming for better interactive feedback.
+    - Keep automatic command execution disabled until the project configuration is verified.
+    - Use project-specific API keys when several teams share the same Volink account.
+
+    **Troubleshooting**
+
+    - `401` or `403`: verify the API key and model access in Volink.
+    - `404`: confirm the model ID and base URL.
+    - **Missing tool calls:** select a model that supports tool use, or disable tool-dependent modes.
+    - **Slow responses:** try a smaller model or reduce context.
+    - **Custom endpoint fails with OpenAI provider type:** switch to `OpenAI Compatible`.
+  </Accordion>
+
+  <Accordion title="Kilo Code">
+    Kilo Code connects to Volink using its OpenAI-compatible provider. The configuration requires a base URL, API key, and model ID.
+
+    **Protocol:** OpenAI-compatible
+
+    <Steps>
+      <Step title="Open Kilo Code settings">
+        Open Kilo Code settings in VS Code.
+      </Step>
+      <Step title="Select provider">
+        Choose `OpenAI Compatible` as the API provider.
+      </Step>
+      <Step title="Fill in provider fields">
+        Enter:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model:** the model ID enabled in your Volink account
+
+        If you need to bypass Kilo Code's path construction, use the full chat completions endpoint instead:
+
+        ```text
+        https://api.volink.org/v1/chat/completions
+        ```
+
+        Do not use both a full endpoint URL and a separate path field if your Kilo Code version exposes one.
+      </Step>
+      <Step title="Configure model metadata">
+        In **Model Configuration**, set the local metadata Kilo Code uses:
+
+        - **Max Output Tokens**
+        - **Context Window**
+        - **Image Support** — enable only for vision-capable models
+        - **Computer Use** — enable only when required
+        - **Input Price / Output Price**
+      </Step>
+      <Step title="Verify">
+        Run a read-only prompt:
+
+        ```text
+        List the main files in this workspace and explain their purpose briefly.
+        ```
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Base URL errors:** the `/v1` suffix is likely missing.
+    - **Invalid model errors:** the configured model is not available to your Volink account.
+    - **Edit failures:** reduce context size or choose a model with stronger coding support.
+    - **Unsupported parameters:** adjust the model configuration and disable unsupported capabilities.
+  </Accordion>
+
+  <Accordion title="OpenClaw">
+    OpenClaw connects to Volink through an OpenAI-compatible endpoint using the `openai-completions` API style.
+
+    **Protocol:** OpenAI-compatible
+
+    <Tabs>
+      <Tab title="Config JSON">
+        Add a provider entry to your OpenClaw configuration:
+
+        ```json
+        {
+          "models": {
+            "providers": {
+              "volink": {
+                "api": "openai-completions",
+                "baseURL": "https://api.volink.org/v1",
+                "envKey": "VOLINK_API_KEY",
+                "models": {
+                  "your_model_id": {
+                    "name": "your_model_id"
+                  }
+                }
+              }
+            }
+          },
+          "agents": {
+            "defaults": {
+              "model": {
+                "primary": "volink/your_model_id"
+              }
+            }
+          }
+        }
+        ```
+
+        Then set the API key in your environment:
+
+        ```bash
+        export VOLINK_API_KEY="your_volink_api_key"
+        ```
+      </Tab>
+      <Tab title="UI settings">
+        If OpenClaw exposes provider settings in its UI instead of a config file, use:
+
+        - **API format:** OpenAI-compatible
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model:** a Volink-enabled chat model
+
+        The default `Authorization: Bearer` header is sufficient for Volink.
+      </Tab>
+    </Tabs>
+
+    **Verify**
+
+    Start a new task and ask OpenClaw to answer without modifying files:
+
+    ```text
+    Confirm the model is connected and describe the current task in one sentence.
+    ```
+
+    **Troubleshooting**
+
+    - **Authentication failure:** regenerate or re-copy the Volink API key.
+    - **Model unavailable:** choose a model listed in your Volink dashboard.
+    - **Request timeout:** reduce context or increase the client's API timeout if available.
+    - **Model discovery issues:** add the model manually instead of relying on `/v1/models`.
+  </Accordion>
+
+  <Accordion title="Hermes">
+    Hermes Agent uses `~/.hermes/config.yaml` for its main model configuration. The legacy `.env` variables `OPENAI_BASE_URL` and `LLM_MODEL` are no longer read for the main model.
+
+    **Protocol:** OpenAI-compatible
+
+    <Tabs>
+      <Tab title="Setup wizard">
+        Run the model setup wizard:
+
+        ```bash
+        hermes model
+        ```
+
+        Choose **Custom endpoint (self-hosted / VLLM / etc.)** and enter:
+
+        - **API base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model name:** a model ID enabled in your Volink account
+
+        Hermes saves the selected provider, base URL, and model to `~/.hermes/config.yaml`.
+      </Tab>
+      <Tab title="Manual config">
+        Edit `~/.hermes/config.yaml` directly:
+
+        ```yaml
+        model:
+          provider: custom
+          default: your_model_id
+          base_url: https://api.volink.org/v1
+          api_key: ${VOLINK_API_KEY}
+        ```
+
+        Set the key in your shell or in `~/.hermes/.env`:
+
+        ```bash
+        VOLINK_API_KEY="your_volink_api_key"
+        ```
+
+        <Note>Keep `~/.hermes/config.yaml` private. Do not commit real API keys to shared dotfiles or repositories.</Note>
+      </Tab>
+    </Tabs>
+
+    **Switching models during a session**
+
+    Use `/model` inside an active Hermes chat only after the custom endpoint is already configured. For example:
+
+    ```text
+    /model custom:your_model_id
+    /model custom
+    ```
+
+    `/model custom` (without a model ID) asks Hermes to query `/models` and auto-select the model when exactly one is available.
+
+    **Auxiliary task models**
+
+    To route an auxiliary task such as web extraction through Volink, add it to `config.yaml`:
+
+    ```yaml
+    auxiliary:
+      web_extract:
+        base_url: https://api.volink.org/v1
+        api_key: ${VOLINK_API_KEY}
+        model: your_model_id
+    ```
+
+    For image analysis, choose a Volink model that supports vision input.
+
+    **Verify**
+
+    ```bash
+    hermes config
+    ```
+
+    Then start Hermes and run a safe read-only prompt:
+
+    ```text
+    Explain how this repository is organized. Do not edit files.
+    ```
+
+    **Troubleshooting**
+
+    - `401`: API key is missing or invalid.
+    - `403`: the API key cannot access the selected model.
+    - `404`: the model ID or endpoint is incorrect.
+    - **Changes do not apply:** run `hermes config` and confirm `~/.hermes/config.yaml` contains the custom provider.
+    - **Legacy env variables:** if you previously used `OPENAI_BASE_URL` or `LLM_MODEL` in `~/.hermes/.env`, migrate those values to `config.yaml`.
+    - **`/model` cannot add the endpoint:** exit the session and run `hermes model`; `/model` only switches among providers already configured.
+  </Accordion>
+
+  <Accordion title="OpenAI Codex CLI">
+    OpenAI Codex CLI supports custom OpenAI-compatible endpoints via environment variables or a `config.toml` provider block. Codex changes quickly — verify the exact configuration names in your installed version.
+
+    **Protocol:** OpenAI-compatible
+
+    <Tabs>
+      <Tab title="Environment variables">
+        Set the Volink key and base URL before starting Codex:
+
+        ```bash
+        export OPENAI_API_KEY="your_volink_api_key"
+        export OPENAI_BASE_URL="https://api.volink.org/v1"
+        ```
+
+        Then start Codex with a model ID enabled in your Volink account:
+
+        ```bash
+        codex --model "your_model_id"
+        ```
+      </Tab>
+      <Tab title="config.toml">
+        If your Codex version supports custom model providers in `config.toml`:
+
+        ```toml
+        model_provider = "volink"
+        model = "your_model_id"
+
+        [model_providers.volink]
+        name = "Volink"
+        base_url = "https://api.volink.org/v1"
+        wire_api = "chat"
+        env_key = "OPENAI_API_KEY"
+        ```
+
+        Use `wire_api = "chat"` because Volink's broadly compatible route for third-party clients is Chat Completions, not the Responses API.
+      </Tab>
+    </Tabs>
+
+    **Verify**
+
+    Run a read-only task:
+
+    ```text
+    Inspect the current project and summarize it without changing files.
+    ```
+
+    **Troubleshooting**
+
+    - **CLI ignores `OPENAI_BASE_URL`:** check whether your installed version supports custom endpoints.
+    - **Authentication fails:** confirm `OPENAI_API_KEY` contains your Volink API key.
+    - **Model fails:** use the exact model ID enabled in Volink.
+    - **Logged in with ChatGPT and also set `OPENAI_API_KEY`:** confirm which auth path your Codex version prioritizes.
+    - **WebSocket or Responses API path fails:** configure a custom provider with `wire_api = "chat"` if supported.
+  </Accordion>
+
+  <Accordion title="OpenCode">
+    OpenCode supports provider customization through `opencode.json`. Add credentials with the `/connect` command, then configure the provider's `baseURL` under the `provider` section.
+
+    **Protocol:** OpenAI-compatible
+
+    <Steps>
+      <Step title="Add credentials">
+        Start OpenCode and run:
+
+        ```text
+        /connect
+        ```
+
+        Choose or create an OpenAI-compatible provider profile and paste your Volink API key. OpenCode stores credentials in `~/.local/share/opencode/auth.json`.
+      </Step>
+      <Step title="Configure the provider">
+        Add a custom provider to `opencode.json`:
+
+        ```json
+        {
+          "$schema": "https://opencode.ai/config.json",
+          "provider": {
+            "volink": {
+              "npm": "@ai-sdk/openai-compatible",
+              "name": "Volink",
+              "options": {
+                "baseURL": "https://api.volink.org/v1"
+              },
+              "models": {
+                "your_model_id": {
+                  "name": "your_model_id"
+                }
+              }
+            }
+          }
+        }
+        ```
+
+        Use the exact model ID enabled in your Volink account. If your model supports tool calling, select it for agentic coding workflows.
+      </Step>
+      <Step title="Verify">
+        Ask OpenCode:
+
+        ```text
+        Summarize this repository in three bullets. Do not edit files.
+        ```
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Endpoint errors:** confirm `/v1` is present in the base URL.
+    - **Model not found:** model IDs are case-sensitive.
+    - **Advanced modes fail:** some OpenCode modes require tool calling or structured output support from the selected model.
+    - **Credentials not picked up:** reconnect the provider with `/connect` and confirm the provider ID in `opencode.json` matches the model selection.
+  </Accordion>
+
+  <Accordion title="Cursor">
+    Cursor supports external provider API keys for standard chat models. Configure the key and base URL in Cursor's model settings.
+
+    **Protocol:** OpenAI-compatible
+
+    <Steps>
+      <Step title="Open Cursor settings">
+        Open **Cursor Settings** and go to **Models**.
+      </Step>
+      <Step title="Enter your API key">
+        Enter your Volink API key in the OpenAI API key field.
+      </Step>
+      <Step title="Set the base URL">
+        If your Cursor version exposes a custom or override OpenAI base URL field, set it to:
+
+        ```text
+        https://api.volink.org/v1
+        ```
+      </Step>
+      <Step title="Verify and select a model">
+        Click **Verify**. Add or select a Volink model ID if your Cursor version supports custom model entries.
+      </Step>
+      <Step title="Confirm the connection">
+        Ask Cursor Chat:
+
+        ```text
+        Reply with a short confirmation that Volink is connected.
+        ```
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Custom endpoint restricted:** Cursor may restrict custom endpoints for some built-in features. Use only the features that expose OpenAI-compatible configuration.
+    - **Authentication error:** the API key field is likely empty or contains an extra space.
+    - **Model error:** the selected model is not enabled for your Volink account.
+    - **Tab completion still uses Cursor models:** tab completion and other specialized Cursor features may continue using Cursor-managed models even when a custom API key is configured.
+  </Accordion>
+
+  <Accordion title="Kiro">
+    Kiro connects to Volink when a custom OpenAI-compatible model provider is available in your Kiro version.
+
+    **Protocol:** OpenAI-compatible
+
+    <Steps>
+      <Step title="Open model provider settings">
+        In Kiro's model provider settings, configure a custom OpenAI-compatible provider.
+      </Step>
+      <Step title="Fill in provider fields">
+        Enter:
+
+        - **Provider type:** OpenAI-compatible
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model:** a Volink-enabled model ID
+      </Step>
+      <Step title="Configure model roles (optional)">
+        If Kiro supports multiple model roles, configure each role with a model suited to the task. Use stronger models for implementation and smaller models for summaries or background work.
+      </Step>
+      <Step title="Verify">
+        Run a safe prompt:
+
+        ```text
+        Read the current project context and explain what you can help with. Do not modify files.
+        ```
+      </Step>
+    </Steps>
+
+    <Note>Kiro's available provider controls may differ by release and workspace policy. If Kiro only supports built-in providers in your environment, Volink cannot be selected for that feature.</Note>
+
+    **Troubleshooting**
+
+    - **No custom provider settings:** Volink cannot be used for that Kiro feature.
+    - `404`: check the `/v1` base URL and model ID.
+    - **Agent features fail:** choose a model with tool calling support.
+    - **Model appears in chat but not in agent mode:** check whether Kiro requires a separate agent model setting.
+  </Accordion>
+
+</AccordionGroup>

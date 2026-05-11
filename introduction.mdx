@@ -1,0 +1,41 @@
+---
+title: "Volink: One API Key for Every AI Model Provider"
+description: "Access OpenAI, Anthropic, Google, DeepSeek, MiniMax, Qwen, and more through one API key and base URL using familiar OpenAI or Anthropic-compatible protocols."
+---
+
+Volink is a unified AI API gateway that routes your requests to leading AI providers — including OpenAI, Anthropic, Google, DeepSeek, MiniMax, MoonshotAI, Qwen, X.AI, BytePlus, and Z.AI — through a single API key and base URL. You keep the same SDK and client code you already use; Volink handles authentication, routing, and protocol normalization behind the scenes.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get your API key and make your first call in minutes.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/overview">
+    Explore all endpoints for chat, speech, and image generation.
+  </Card>
+  <Card title="Integrations" icon="puzzle-piece" href="/integrations/ai-agents">
+    Connect Volink to AI agents, chat platforms, and role-play apps.
+  </Card>
+  <Card title="Account setup" icon="key" href="/account/api-keys">
+    Create and manage API keys in your Volink account.
+  </Card>
+</CardGroup>
+
+## What Volink provides
+
+Volink supports three categories of AI APIs, all accessible with your single Volink API key:
+
+- **Chat completions** — text generation and tool calling via OpenAI-compatible or Anthropic-compatible protocols
+- **Text-to-speech** — audio synthesis via OpenAI Speech or the Volink TTS endpoint
+- **Image generation** — image creation via the OpenAI Images API or Volink's chat-based image generation endpoint
+
+## Which API protocol should I use?
+
+Choose the protocol that matches the SDK or client you are already using. All three protocols use the same Volink API key and base URL (`https://api.volink.org`).
+
+| Protocol | Best for | Auth header | Chat endpoint |
+|---|---|---|---|
+| **OpenAI-compatible** | OpenAI SDKs, most AI agent tools and chat clients | `Authorization: Bearer` | `POST /v1/chat/completions` |
+| **Anthropic-compatible** | Anthropic SDKs, Claude-style clients | `x-api-key` + `anthropic-version: 2023-06-01` | `POST /v1/messages` |
+| **Volink-native** | Volink-specific features such as chat-based image generation | `Authorization: Bearer` | `POST /v1/chat/completions` with `modalities` |
+
+If you are unsure which to pick, start with the OpenAI-compatible protocol — it works with the widest range of tools and SDKs.

@@ -1,0 +1,45 @@
+---
+title: "API Authentication — Volink API Keys and Headers"
+description: "Learn how to authenticate Volink API requests using bearer tokens for OpenAI-compatible endpoints and x-api-key headers for the Anthropic protocol."
+---
+
+All Volink API requests require authentication via your API key. The header you use depends on which protocol you are calling — OpenAI-compatible endpoints use standard bearer authentication, while the Anthropic-compatible endpoint expects the `x-api-key` header by default.
+
+<Warning>
+  Do not expose your API key in client-side code or commit it to a repository. Store it as an environment variable and access it server-side.
+</Warning>
+
+## Authentication headers
+
+<Tabs>
+  <Tab title="OpenAI protocol">
+    Include your Volink API key as a bearer token in the `Authorization` header for all OpenAI-compatible endpoints (`/v1/chat/completions`, `/v1/audio/speech`, `/v1/images/generations`, `/v1/tts/speech`):
+
+    ```http
+    Authorization: Bearer YOUR_VOLINK_API_KEY
+    Content-Type: application/json
+    ```
+  </Tab>
+  <Tab title="Anthropic protocol">
+    The Anthropic Messages endpoint (`/v1/messages`) expects the `x-api-key` header along with a required `anthropic-version` header:
+
+    ```http
+    x-api-key: YOUR_VOLINK_API_KEY
+    anthropic-version: 2023-06-01
+    content-type: application/json
+    ```
+
+    Volink also accepts `Authorization: Bearer` on the Anthropic-compatible endpoint if your HTTP client or SDK uses bearer authentication. Use one authentication style consistently within a single request.
+  </Tab>
+</Tabs>
+
+## Environment variable setup
+
+Store your API key as an environment variable to keep it out of source code:
+
+```bash
+export VOLINK_API_KEY="your_api_key"
+export VOLINK_BASE_URL="https://api.volink.org"
+```
+
+You can then reference `$VOLINK_API_KEY` and `$VOLINK_BASE_URL` directly in curl commands and SDK configuration.

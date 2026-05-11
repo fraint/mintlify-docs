@@ -1,0 +1,171 @@
+---
+title: "POST /v1/chat/completions — OpenAI Chat Protocol"
+description: "Send chat messages to any Volink-supported model using the OpenAI Chat Completions protocol, with support for streaming, tools, and structured output."
+---
+
+The `/v1/chat/completions` endpoint follows the OpenAI Chat Completions protocol and works with any OpenAI-compatible client or SDK. Point your client at `https://api.volink.org` with your Volink API key and use it exactly as you would the OpenAI API.
+
+## Endpoint
+
+```http
+POST /v1/chat/completions
+```
+
+## Request parameters
+
+<ParamField body="model" type="string" required>
+  Model ID to use. Replace the example value with a model ID enabled in your Volink account.
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  Conversation messages. Each item is an object with a `role` (`system`, `user`, or `assistant`) and a `content` string.
+</ParamField>
+
+<ParamField body="temperature" type="number">
+  Sampling temperature. Higher values produce more varied output; lower values produce more deterministic output.
+</ParamField>
+
+<ParamField body="top_p" type="number">
+  Nucleus sampling value. The model considers only tokens comprising the top `top_p` probability mass.
+</ParamField>
+
+<ParamField body="max_tokens" type="integer">
+  Maximum number of tokens to generate. Some models may use `max_completion_tokens` instead.
+</ParamField>
+
+<ParamField body="stream" type="boolean">
+  Set to `true` to receive the response as a stream of server-sent events instead of a single JSON object.
+</ParamField>
+
+<ParamField body="tools" type="array">
+  Tool and function definitions available to the model. Each item describes a callable function with a name, description, and parameter schema.
+</ParamField>
+
+<ParamField body="tool_choice" type="string | object">
+  Controls whether and how the model selects a tool. Pass `"auto"`, `"none"`, or an object specifying a particular function.
+</ParamField>
+
+<ParamField body="response_format" type="object">
+  Structured output or JSON mode configuration when supported by the model. Pass `{ "type": "json_object" }` to enable JSON mode.
+</ParamField>
+
+## Examples
+
+<Tabs>
+  <Tab title="Standard request">
+    ```bash
+    curl "$VOLINK_BASE_URL/v1/chat/completions" \
+      -H "Authorization: Bearer $VOLINK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "model": "gpt-4.1",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a helpful assistant."
+          },
+          {
+            "role": "user",
+            "content": "Explain Volink in one sentence."
+          }
+        ],
+        "temperature": 0.7
+      }'
+    ```
+  </Tab>
+  <Tab title="Streaming request">
+    ```bash
+    curl "$VOLINK_BASE_URL/v1/chat/completions" \
+      -H "Authorization: Bearer $VOLINK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "model": "gpt-4.1",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Write a short haiku about APIs."
+          }
+        ],
+        "stream": true
+      }'
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  When `stream` is `true`, the server sends a sequence of server-sent events. Each event contains a JSON delta. The stream ends with a `data: [DONE]` message. Ensure your HTTP client supports SSE or reads the raw response line by line.
+</Note>
+
+## Response
+
+```json
+{
+  "id": "chatcmpl_xxx",
+  "object": "chat.completion",
+  "created": 1710000000,
+  "model": "openai/gpt-4.1",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Volink lets developers access multiple AI models through unified APIs."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 20,
+    "completion_tokens": 12,
+    "total_tokens": 32
+  }
+}
+```
+
+<ResponseField name="id" type="string">
+  Unique identifier for the completion.
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  Always `"chat.completion"` for non-streaming responses.
+</ResponseField>
+
+<ResponseField name="created" type="integer">
+  Unix timestamp of when the completion was created.
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  The model that generated the response, prefixed with the provider slug.
+</ResponseField>
+
+<ResponseField name="choices" type="array">
+  Array of completion choices. Each item contains an `index`, a `message` object, and a `finish_reason`.
+
+  <Expandable title="properties">
+    <ResponseField name="choices[].index" type="integer">
+      Zero-based index of this choice.
+    </ResponseField>
+    <ResponseField name="choices[].message" type="object">
+      The assistant message. Contains `role` (`"assistant"`) and `content` (the generated text).
+    </ResponseField>
+    <ResponseField name="choices[].finish_reason" type="string">
+      Why generation stopped. Common values: `"stop"`, `"length"`, `"tool_calls"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="usage" type="object">
+  Token counts for billing and monitoring.
+
+  <Expandable title="properties">
+    <ResponseField name="usage.prompt_tokens" type="integer">
+      Tokens consumed by the input messages.
+    </ResponseField>
+    <ResponseField name="usage.completion_tokens" type="integer">
+      Tokens generated in the response.
+    </ResponseField>
+    <ResponseField name="usage.total_tokens" type="integer">
+      Sum of prompt and completion tokens.
+    </ResponseField>
+  </Expandable>
+</ResponseField>

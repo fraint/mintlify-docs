@@ -1,0 +1,424 @@
+---
+title: "将 Volink 与开源聊天平台集成"
+description: "在开源和桌面聊天客户端中使用 Volink。配置任何 OpenAI 兼容聊天应用以通过您的 Volink API 密钥路由请求。"
+---
+
+Volink 通过其 OpenAI 兼容 API 与流行的开源和桌面聊天客户端一起工作。将任何支持的聊天平台指向 `https://api.volink.org/v1`,提供您的 Volink API 密钥并选择一个模型 —— 全部无需为每个应用管理单独的提供商账户。
+
+<AccordionGroup>
+
+  <Accordion title="Chatbox">
+    Chatbox 支持具有专用配置流程的自定义模型提供商。将 Volink 添加为提供商,设置 API 类型,填写密钥和主机,然后验证连接。
+
+    <Steps>
+      <Step title="打开模型提供商设置">
+        打开 Chatbox,点击侧边栏中的设置按钮,然后打开 **Model Provider**。
+      </Step>
+      <Step title="添加提供商">
+        如果 Volink 尚未列出,请点击 **Add**。输入提供商名称(例如 `Volink`),然后选择 `OpenAI API compatible`。
+      </Step>
+      <Step title="填写提供商字段">
+        输入:
+
+        - **API 模式:** OpenAI 兼容
+        - **API Host:** `https://api.volink.org`
+        - **API Path:** 留空以使用默认的 `/v1/chat/completions`,或者如果您的版本需要明确路径,请输入 `/v1/chat/completions`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** 至少添加一个 Volink 模型 ID
+
+        如果 Chatbox 要求单个完整的端点 URL,请使用:
+
+        ```text
+        https://api.volink.org/v1
+        ```
+
+        如果它要求完整的聊天补全 URL,请使用:
+
+        ```text
+        https://api.volink.org/v1/chat/completions
+        ```
+      </Step>
+      <Step title="检查并使用提供商">
+        点击 **Check** 验证连接。返回主页,创建新对话,然后选择 Volink 模型。
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **请求路径重复:** 删除 `/v1` 后缀或单独的 API 路径字段 —— 不要同时包含两者。
+    - **身份验证失败:** 检查 API 密钥。
+    - **模型失败:** 使用 Volink 中的精确模型 ID。
+    - **模型缺少图像或工具功能:** 在 Chatbox 中编辑该模型的功能配置。
+  </Accordion>
+
+  <Accordion title="Cherry Studio">
+    Cherry Studio 支持具有 API 地址覆盖的 OpenAI 兼容提供商。标记为 `Secret`、`Key`、`API Key` 和 `Token` 的字段都指同一个凭证。
+
+    <Steps>
+      <Step title="打开提供商设置">
+        打开 Cherry Studio 提供商设置,并添加或编辑 OpenAI 兼容提供商。
+      </Step>
+      <Step title="填写提供商字段">
+        输入:
+
+        - **API key:** 您的 Volink API 密钥
+        - **API address:** `https://api.volink.org/v1`
+        - **Model:** Volink 启用的模型 ID
+      </Step>
+      <Step title="添加模型">
+        保存提供商后,添加或刷新模型列表。如果自动模型发现不可用,请手动添加模型 ID 并启用提供商切换。
+      </Step>
+      <Step title="验证">
+        打开新对话并发送:
+
+        ```text
+        Say hello from Volink in one sentence.
+        ```
+      </Step>
+    </Steps>
+
+    <Note>Cherry Studio 支持在一个提供商字段中使用多个密钥,以逗号分隔,用于密钥轮询。对于标准设置,请使用单个 Volink API 密钥。</Note>
+
+    **故障排除**
+
+    - **API 地址格式:** 使用 `https://api.volink.org/v1`。如果 Cherry Studio 只要求根地址并自行附加路径,请使用 `https://api.volink.org`。
+    - **模型发现失败:** 手动添加模型 ID。
+    - **功能错误:** 确认所选模型支持 Cherry Studio 中启用的功能,例如视觉或工具。
+  </Accordion>
+
+  <Accordion title="Kelivo">
+    Kelivo 通过其 OpenAI 兼容自定义端点设置连接到 Volink,带有可选的标头、超时、重试和代理控制。
+
+    <Steps>
+      <Step title="打开提供商设置">
+        打开 Kelivo 设置,然后打开提供商或自定义请求设置。
+      </Step>
+      <Step title="配置提供商">
+        输入:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** 您要使用的 Volink 模型 ID
+      </Step>
+      <Step title="设置路径前缀(如适用)">
+        如果 Kelivo 将路径前缀与基础 URL 分开,请使用:
+
+        - **Chat completions path:** `/chat/completions`
+        - **Models path:** `/models`
+
+        当基础 URL 已经以 `/v1` 结尾时,请勿输入 `/v1/chat/completions` 作为路径。
+      </Step>
+      <Step title="验证">
+        发送:
+
+        ```text
+        Confirm the Volink connection with a short response.
+        ```
+      </Step>
+    </Steps>
+
+    **可选请求设置**
+
+    Kelivo 支持自定义标头、超时、重试次数和代理设置。从默认的 Bearer 身份验证开始。仅当您的 Volink 工作区或网络网关需要时才添加自定义标头。如果您的网络不稳定,请在调整模型设置之前增加超时和重试值。
+
+    **故障排除**
+
+    - **身份验证错误:** API 密钥无效或缺失。
+    - **模型错误:** 模型 ID 未为您的账户启用。
+    - **功能错误:** 所选模型不支持请求的功能。
+    - **路径错误:** `/v1` 或 `/chat/completions` 重复 —— 使用其中之一。
+  </Accordion>
+
+  <Accordion title="RikkaHub Android">
+    RikkaHub Android 通过其设置面板添加 OpenAI 兼容提供商。基础 URL 必须以 `/v1` 结尾,因为 RikkaHub 会自行附加 `/chat/completions` 等路径。
+
+    <Steps>
+      <Step title="打开提供商">
+        启动 RikkaHub,通过左上角按钮打开侧边栏,点击 **Settings**,然后点击 **Providers**。
+      </Step>
+      <Step title="添加提供商">
+        点击右上角的加号按钮以添加新提供商。
+      </Step>
+      <Step title="配置提供商">
+        输入:
+
+        - **Provider type:** OpenAI-compatible
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** Volink 启用的聊天模型 ID
+
+        <Warning>请勿输入完整的 `/chat/completions` 端点。RikkaHub 会自动将该路径附加到基础 URL。</Warning>
+      </Step>
+      <Step title="添加模型 ID">
+        点击模型框图标并添加一个或多个 Volink 模型 ID。
+      </Step>
+      <Step title="开始聊天">
+        返回主页并开始聊天。发送:
+
+        ```text
+        Reply with a short confirmation that Volink is connected.
+        ```
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **意外空格:** 在移动键盘上,检查 API 密钥中是否有前导或尾随空格。
+    - **无法到达服务器:** 确认网络访问和精确的基础 URL。
+    - **图像或语音功能失败:** 选择支持这些功能的模型。
+    - **重复路径:** 将 URL 改回 `https://api.volink.org/v1`。
+  </Accordion>
+
+  <Accordion title="OpenWebUI">
+    OpenWebUI 作为 OpenAI 兼容后端连接到 Volink。它期望 OpenAI Chat Completions 兼容的端点 (`/v1/models` 和 `/v1/chat/completions`)。
+
+    <Tabs>
+      <Tab title="管理员 UI">
+        <Steps>
+          <Step title="打开连接">
+            在浏览器中打开 OpenWebUI,转到 **Admin Settings** → **Connections** → **OpenAI**,然后点击 **Add Connection**。
+          </Step>
+          <Step title="填写连接详情">
+            输入:
+
+            - **URL:** `https://api.volink.org/v1`
+            - **API Key:** 您的 Volink API 密钥
+            - **Model IDs:** 留空以使用模型发现,或添加特定的 Volink 模型 ID 以限制允许列表
+          </Step>
+          <Step title="保存并选择模型">
+            保存连接,然后从聊天模型菜单中选择 Volink 模型。
+          </Step>
+        </Steps>
+      </Tab>
+      <Tab title="自托管(环境变量)">
+        对于自托管部署,设置:
+
+        ```bash
+        OPENAI_API_BASE_URL="https://api.volink.org/v1"
+        OPENAI_API_KEY="your_volink_api_key"
+        ```
+
+        如果您使用多个 OpenAI 兼容后端,OpenWebUI 还支持用分号分隔的 `OPENAI_API_BASE_URLS`。
+
+        更改环境变量后重启 OpenWebUI。
+      </Tab>
+    </Tabs>
+
+    **验证**
+
+    在聊天 UI 中选择 Volink 模型并发送:
+
+    ```text
+    Give a one-sentence confirmation that this chat is using Volink.
+    ```
+
+    **故障排除**
+
+    - **环境变量未应用:** 任何环境更改后重启 OpenWebUI。
+    - **模型列表为空:** 如果禁用了发现,请刷新或手动添加模型。
+    - **上游错误:** 检查服务器日志以获取 Volink 返回的状态代码。
+    - **RAG 嵌入失败:** 聊天模型和嵌入模型是单独的设置 —— 请同时配置两者。
+  </Accordion>
+
+  <Accordion title="LobeChat">
+    LobeChat 可以通过应用中的 OpenAI 提供商设置使用 Volink,或通过环境变量用于自托管部署。
+
+    <Tabs>
+      <Tab title="应用内设置">
+        <Steps>
+          <Step title="打开语言模型设置">
+            在 LobeChat 中,导航到语言模型设置并选择 **OpenAI** 作为提供商。
+          </Step>
+          <Step title="输入 Volink 凭证">
+            设置:
+
+            - **API key:** 您的 Volink API 密钥
+            - **API proxy address / API host:** `https://api.volink.org/v1`
+            - **Custom model:** Volink 启用的模型 ID
+          </Step>
+          <Step title="获取或添加模型">
+            如果 UI 具有模型列表获取操作,请在保存代理地址后运行它。否则,手动添加 Volink 模型 ID。
+          </Step>
+        </Steps>
+      </Tab>
+      <Tab title="自托管(环境变量)">
+        对于 Docker 或其他自托管部署,设置:
+
+        ```bash
+        OPENAI_API_KEY="your_volink_api_key"
+        OPENAI_PROXY_URL="https://api.volink.org/v1"
+        ```
+
+        更改环境变量后重启 LobeChat。
+
+        <Note>检查您的 LobeChat 版本期望代理 URL 带或不带 `/v1`。从 `/v1` 开始;如果请求重复或为空,请尝试仅主机值并检查服务器日志。</Note>
+      </Tab>
+    </Tabs>
+
+    **验证**
+
+    使用 Volink 模型创建新聊天并发送:
+
+    ```text
+    Confirm Volink is connected in one sentence.
+    ```
+
+    **故障排除**
+
+    - **仅浏览器部署:** 提供商设置可能存储在本地 —— 验证当前工作区使用 Volink 提供商。
+    - **自托管未更新:** 环境更改后需要重启。
+    - **模型发现失败:** 手动添加模型 ID。
+    - **功能特定失败:** 首先测试普通聊天;某些 LobeChat 功能使用提供商特定功能。
+  </Accordion>
+
+  <Accordion title="LibreChat">
+    LibreChat 通过在 `librechat.yaml` 中定义的自定义端点将 OpenAI 兼容请求路由到 Volink。请将 API 密钥保存在 `.env` 中,而不是直接在配置文件中。
+
+    <Steps>
+      <Step title="配置 librechat.yaml">
+        添加自定义端点:
+
+        ```yaml
+        version: 1.3.5
+        cache: true
+
+        endpoints:
+          custom:
+            - name: "Volink"
+              apiKey: "${VOLINK_API_KEY}"
+              baseURL: "https://api.volink.org/v1"
+              models:
+                default:
+                  - "your_model_id"
+                fetch: true
+              titleConvo: true
+              titleModel: "your_model_id"
+              modelDisplayLabel: "Volink"
+        ```
+
+        使用 `fetch: true` 让 LibreChat 调用 `/v1/models`。使用 `fetch: false` 并手动列出模型以获得精选的模型选择器。
+      </Step>
+      <Step title="设置环境变量">
+        将您的密钥添加到 `.env`:
+
+        ```bash
+        VOLINK_API_KEY=your_volink_api_key
+        ```
+      </Step>
+      <Step title="在 Docker 中挂载配置(如适用)">
+        确保 `librechat.yaml` 已挂载到 API 容器中:
+
+        ```yaml
+        services:
+          api:
+            volumes:
+              - type: bind
+                source: ./librechat.yaml
+                target: /app/librechat.yaml
+        ```
+
+        然后重启 LibreChat:
+
+        ```bash
+        docker compose down
+        docker compose up -d
+        ```
+      </Step>
+      <Step title="验证">
+        在 LibreChat 中选择 Volink 模型并发送:
+
+        ```text
+        Reply with one sentence confirming this model works.
+        ```
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **未出现端点:** 检查 YAML 缩进并确认 `librechat.yaml` 已挂载。
+    - **后端未更新:** 任何提供商配置更改后重启后端。
+    - **错误的模型 ID:** 确认配置的模型列表使用精确的 Volink 模型 ID。
+    - **工具或插件失败:** 选择支持工具调用的模型。
+    - **使用完整的 `/v1/chat/completions` URL:** 在端点配置中设置 `directEndpoint: true`。
+    - **上游错误:** 检查 LibreChat 服务器日志以获取 Volink 状态代码。
+  </Accordion>
+
+  <Accordion title="NextChat">
+    NextChat 通过选择 OpenAI 提供商并覆盖基础 URL 连接到 Volink。
+
+    <Steps>
+      <Step title="打开设置">
+        打开 NextChat 设置并选择 **OpenAI** 作为模型提供商。
+      </Step>
+      <Step title="输入 Volink 凭证">
+        设置:
+
+        - **API key:** 您的 Volink API 密钥
+        - **API base URL:** `https://api.volink.org/v1`
+        - **Model:** Volink 启用的模型 ID
+      </Step>
+      <Step title="添加自定义模型(如需要)">
+        如果模型不在默认模型列表中,请手动将其作为自定义模型添加。某些 NextChat 版本要求自定义模型名称用逗号分隔,且无空格。
+      </Step>
+      <Step title="保存并验证">
+        保存设置,开始新聊天,然后发送:
+
+        ```text
+        Say that Volink is connected in one short sentence.
+        ```
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **请求仍发送到 OpenAI:** 确认自定义基础 URL 已保存并激活。
+    - **模型菜单为空:** 手动添加模型 ID。
+    - **CORS 或网络错误:** 检查部署的服务器端代理设置。
+    - **UI 隐藏非 OpenAI 模型:** 将其添加为自定义模型,而不是依赖默认列表。
+  </Accordion>
+
+  <Accordion title="AnythingLLM">
+    AnythingLLM 将 Volink 用作 `Generic OpenAI` LLM 提供商。聊天和嵌入模型是单独配置的 —— 如果您希望使用 RAG 进行文档聊天,请同时配置两者。
+
+    <Steps>
+      <Step title="打开 LLM 设置">
+        打开 AnythingLLM,点击设置或扳手图标,然后转到 **AI Providers** → **LLM**。
+      </Step>
+      <Step title="选择 Generic OpenAI">
+        选择 **Generic OpenAI** 并输入:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Chat model:** Volink 启用的聊天模型 ID
+      </Step>
+      <Step title="配置工作区">
+        创建或打开工作区,并为聊天选择配置的提供商和模型。
+      </Step>
+      <Step title="配置嵌入器(可选)">
+        对于文档聊天,还要配置嵌入提供商:
+
+        1. 转到 **AI Providers** → **Embedder**。
+        2. 选择嵌入提供商。
+        3. 如果可用,使用 Volink 支持的嵌入模型,或配置另一个嵌入提供商。
+        4. 在提出问题之前,将文档上传到工作区并保存和嵌入它们。
+
+        <Note>如果 LLM 提供商已配置但嵌入器未配置,则聊天可以工作,但文档检索可能会失败。</Note>
+      </Step>
+      <Step title="验证">
+        创建工作区聊天并发送:
+
+        ```text
+        Confirm in one sentence that the LLM connection works.
+        ```
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **聊天和文档检索是分开的:** 如果文档聊天失败,请检查嵌入提供商以及聊天提供商。
+    - **模型被拒绝:** 验证 Volink 中的精确模型 ID。
+    - **`Chat Model Name` 字段:** 输入原始 Volink 模型 ID,而不是显示标签。
+    - **响应过短:** 调整工作区最大 token 设置,并确认模型的输出限制。
+  </Accordion>
+
+</AccordionGroup>

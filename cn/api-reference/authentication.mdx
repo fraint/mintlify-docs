@@ -1,0 +1,45 @@
+---
+title: "API 身份验证 —— Volink API 密钥和标头"
+description: "了解如何使用 Bearer 令牌对 OpenAI 兼容端点进行 Volink API 请求身份验证,以及使用 x-api-key 标头对 Anthropic 协议进行身份验证。"
+---
+
+所有 Volink API 请求都需要通过您的 API 密钥进行身份验证。您使用的标头取决于您调用的协议 —— OpenAI 兼容端点使用标准 Bearer 身份验证,而 Anthropic 兼容端点默认期望使用 `x-api-key` 标头。
+
+<Warning>
+  不要在客户端代码中暴露您的 API 密钥或将其提交到仓库。请将其作为环境变量存储,并在服务器端访问它。
+</Warning>
+
+## 身份验证标头
+
+<Tabs>
+  <Tab title="OpenAI 协议">
+    对于所有 OpenAI 兼容端点(`/v1/chat/completions`、`/v1/audio/speech`、`/v1/images/generations`、`/v1/tts/speech`),将 Volink API 密钥作为 Bearer 令牌包含在 `Authorization` 标头中:
+
+    ```http
+    Authorization: Bearer YOUR_VOLINK_API_KEY
+    Content-Type: application/json
+    ```
+  </Tab>
+  <Tab title="Anthropic 协议">
+    Anthropic Messages 端点 (`/v1/messages`) 期望 `x-api-key` 标头以及必需的 `anthropic-version` 标头:
+
+    ```http
+    x-api-key: YOUR_VOLINK_API_KEY
+    anthropic-version: 2023-06-01
+    content-type: application/json
+    ```
+
+    如果您的 HTTP 客户端或 SDK 使用 Bearer 身份验证,Volink 也接受在 Anthropic 兼容端点上使用 `Authorization: Bearer`。在单个请求中始终保持一种身份验证方式。
+  </Tab>
+</Tabs>
+
+## 环境变量设置
+
+将您的 API 密钥存储为环境变量,以使其远离源代码:
+
+```bash
+export VOLINK_API_KEY="your_api_key"
+export VOLINK_BASE_URL="https://api.volink.org"
+```
+
+然后,您可以在 curl 命令和 SDK 配置中直接引用 `$VOLINK_API_KEY` 和 `$VOLINK_BASE_URL`。

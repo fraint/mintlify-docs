@@ -1,0 +1,106 @@
+---
+title: "Volink Image Generation via Chat Completions API"
+description: "Use Volink's chat completions endpoint with modalities to generate images from multimodal models that return image and text output together."
+---
+
+Volink also supports image generation through the chat completions endpoint using the `modalities` field. Unlike the OpenAI Images API, this approach works with multimodal models that can return both images and text in a single response, such as Gemini image preview models.
+
+## Endpoint
+
+```http
+POST /v1/chat/completions
+```
+
+## Request parameters
+
+<ParamField body="model" type="string" required>
+  An image-capable model ID. Use the models discovery endpoint to find models that support image output (see below).
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  Prompt messages. Structure them the same way as a standard chat request — typically a single `user` message describing the image you want.
+</ParamField>
+
+<ParamField body="modalities" type="array" required>
+  Specifies the output types you expect from the model. Use `["image"]` for image-only models, or `["image", "text"]` for models that return both image and text output.
+</ParamField>
+
+<ParamField body="image_config" type="object">
+  Model-specific image generation options such as aspect ratio or output size. Supported keys depend on the model.
+</ParamField>
+
+<ParamField body="stream" type="boolean">
+  Set to `true` to stream the response when the model supports it.
+</ParamField>
+
+## Example
+
+```bash
+curl "$VOLINK_BASE_URL/v1/chat/completions" \
+  -H "Authorization: Bearer $VOLINK_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemini-2.5-flash-image-preview",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Generate a modern dashboard mockup for Volink analytics."
+      }
+    ],
+    "modalities": ["image", "text"],
+    "image_config": {
+      "aspect_ratio": "16:9"
+    }
+  }'
+```
+
+## Response
+
+Generated images are returned in the assistant message, commonly as base64 data URLs embedded in an `images` array alongside any text content:
+
+```json
+{
+  "id": "gen_xxx",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Here is the generated image.",
+        "images": [
+          {
+            "image_url": {
+              "url": "data:image/png;base64,..."
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ]
+}
+```
+
+<ResponseField name="choices[].message.content" type="string">
+  Text portion of the assistant response. Present when `modalities` includes `"text"`.
+</ResponseField>
+
+<ResponseField name="choices[].message.images" type="array">
+  Array of generated image objects embedded in the assistant message.
+
+  <Expandable title="properties">
+    <ResponseField name="images[].image_url.url" type="string">
+      A data URL containing the base64-encoded image, for example `data:image/png;base64,...`. Decode or render this directly in an `<img>` tag.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Discover image-capable models
+
+Use the `/v1/models` endpoint with the `output_modalities=image` query parameter to list all models that support image output:
+
+```bash
+curl "$VOLINK_BASE_URL/v1/models?output_modalities=image" \
+  -H "Authorization: Bearer $VOLINK_API_KEY"
+```

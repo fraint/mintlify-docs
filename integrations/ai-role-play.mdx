@@ -1,0 +1,253 @@
+---
+title: "Integrate Volink with AI Role-Play Applications"
+description: "Integrate Volink with character-chat and role-play platforms via the OpenAI-compatible API. Covers Tavo, Janitor AI, SillyTavern, and RiseAI."
+---
+
+Volink integrates with AI role-play and character-chat platforms through its OpenAI-compatible API. Set your Volink base URL and API key in any supported app, choose a model with enough context for your character definitions, and route all inference through Volink.
+
+<AccordionGroup>
+
+  <Accordion title="Tavo">
+    Tavo has built-in Volink support. Use the native **Volink** model platform option in Tavo's API connection flow — no custom base URL required.
+
+    <Steps>
+      <Step title="Get a Volink API key">
+        Before configuring Tavo:
+
+        1. Sign in at [volink.org](https://volink.org).
+        2. Open the Volink console and go to **API Keys**.
+        3. Create a new key and store it securely.
+        4. Confirm the model ID you want to use is enabled for your account.
+      </Step>
+      <Step title="Open API Connection">
+        Open Tavo, tap the blue **API Connection** button, or open the menu bar and tap **API Connection**.
+      </Step>
+      <Step title="Add a new connection">
+        Tap **Add New**. In **Model Platform**, choose **Volink**.
+      </Step>
+      <Step title="Enter your credentials">
+        Fill in:
+
+        | Tavo field | Volink value |
+        |---|---|
+        | API Key | Your Volink API key |
+        | Model Platform | `Volink` |
+        | Model | Select a Volink model available in Tavo |
+
+        Tap **Save**. If Tavo shows `Saved Successfully`, the connection is established.
+      </Step>
+      <Step title="Set Volink as default">
+        Open **API Connection**, tap the menu icon next to the Volink connection, choose **Set as default**, then start or reopen a character chat.
+      </Step>
+    </Steps>
+
+    **Fallback: Custom OpenAI Protocol**
+
+    If the native **Volink** platform option is not available in your Tavo version, use the fallback:
+
+    | Tavo field | Volink value |
+    |---|---|
+    | Model Platform | `Custom (OpenAI Protocol)` |
+    | API Key | Your Volink API key |
+    | API Base URL / Custom Endpoint | `https://api.volink.org/v1` |
+    | Model Name | A Volink-enabled model ID |
+
+    <Warning>Do not enter `https://api.volink.org/v1/chat/completions` in the custom endpoint field. Use only the `/v1` base URL.</Warning>
+
+    **Model parameters**
+
+    Tavo supports model parameter configuration in two places:
+
+    - **Global settings:** open the left sidebar → **More** → **Settings** → **Model Settings**
+    - **API connection settings:** open **API Connection**, find the Volink connection, tap **Parameter Settings**
+
+    API connection settings take priority over global settings. Start with conservative values:
+
+    - Enable streaming if available.
+    - Set **Reply Token Limit** within the selected model's output limit.
+    - Set **Context Memory Length** within the model's context window.
+    - Use `Temperature`, `Top-P`, and `Top-K` values supported by the selected model.
+
+    If an advanced sampling parameter causes an API error, remove it or return to the model's default value.
+
+    **Prompt compatibility**
+
+    If the selected model rejects the request format when using the Custom OpenAI Protocol fallback, try Tavo's built-in prompt converters — use the least restrictive one that fixes the error:
+
+    - Merge consecutive messages from the same character
+    - Allow only one system message
+    - Allow one optional system message and require the user role to be first
+
+    **Verify**
+
+    1. Set the Volink connection as default.
+    2. Open a character chat.
+    3. Send a short test message and confirm the character returns a response.
+
+    **Troubleshooting**
+
+    - **Invalid API key:** copy the key exactly, with no leading or trailing spaces.
+    - **Connection failure (native Volink):** confirm **Model Platform** is set to `Volink` and the key is valid.
+    - **Connection failure (custom fallback):** confirm the endpoint is `https://api.volink.org/v1`, not the full `/chat/completions` URL.
+    - **Model name error:** select an available model in Tavo's Volink model list, or use the exact Volink model ID with the custom fallback.
+    - **Empty model response:** try disabling streaming in Tavo model settings.
+    - **Request size exceeded:** reduce **Context Memory Length**.
+    - **Replies too short:** increase **Reply Token Limit** within the model's supported range.
+    - **Network issue:** confirm your device can reach `https://api.volink.org`.
+  </Accordion>
+
+  <Accordion title="Janitor AI">
+    Janitor AI can use Volink when your selected connection mode supports an OpenAI-compatible custom endpoint. Many Janitor AI proxy guides use a full chat-completions URL rather than only the `/v1` base URL.
+
+    <Steps>
+      <Step title="Open AI Providers settings">
+        Open Janitor AI settings and navigate to **AI Providers** or the custom API configuration panel.
+      </Step>
+      <Step title="Select the provider type">
+        Choose **Custom**, **Proxy**, or **OpenAI Compatible**, depending on the UI label in your account.
+      </Step>
+      <Step title="Configure the endpoint">
+        If Janitor AI shows a single proxy URL field, use:
+
+        ```text
+        https://api.volink.org/v1/chat/completions
+        ```
+
+        If it has separate fields for base URL and endpoint, use:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **Endpoint:** `chat/completions`
+
+        Then set:
+
+        - **API key:** your Volink API key
+        - **Model:** a Volink-enabled chat model ID
+      </Step>
+      <Step title="Verify">
+        Start a test chat and send a simple greeting. A successful reply confirms Janitor AI is routing through Volink.
+      </Step>
+    </Steps>
+
+    **Recommended settings**
+
+    - Use a model with a large enough context window for your character definitions.
+    - Keep max response length moderate for interactive chat.
+    - Disable unsupported provider-specific options if requests fail.
+
+    **Troubleshooting**
+
+    - **Authentication error:** the key was likely copied incorrectly.
+    - **Model error:** the selected model is not enabled in Volink.
+    - **Replies cut off:** increase the response token limit or reduce prompt context.
+    - **Janitor AI never calls Volink after saving:** hard-refresh the browser or reopen the chat session.
+    - **Duplicated paths:** switch from the full endpoint to the separated base URL and endpoint fields.
+  </Accordion>
+
+  <Accordion title="SillyTavern">
+    SillyTavern connects to Volink through the **Chat Completion** API mode with the **Custom (OpenAI-compatible)** source. Do not append `/chat/completions` to the custom endpoint field — SillyTavern appends that path itself.
+
+    <Steps>
+      <Step title="Open API Connections">
+        Open SillyTavern and navigate to **API Connections**.
+      </Step>
+      <Step title="Set the API type">
+        Set **API type** to `Chat Completion` and set **Chat Completion Source** to `Custom (OpenAI-compatible)`.
+      </Step>
+      <Step title="Enter Volink credentials">
+        Enter:
+
+        - **Custom endpoint URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model:** a Volink-enabled chat model ID
+
+        <Warning>Do not add `/chat/completions` to the custom endpoint field. SillyTavern appends that path automatically.</Warning>
+      </Step>
+      <Step title="Select a model">
+        If Volink model discovery is available to your account, SillyTavern populates a dropdown from `/v1/models`. Otherwise, enter the model ID manually.
+
+        Choose a model with enough context for:
+
+        - Character card
+        - Author's note
+        - Lorebook entries
+        - Memory
+        - Recent chat history
+      </Step>
+      <Step title="Configure prompt post-processing (if needed)">
+        If the selected model rejects message ordering or system-message layout, use SillyTavern's prompt post-processing options. Start with the least restrictive and tighten only when the endpoint returns formatting errors:
+
+        1. None
+        2. Merge consecutive messages
+        3. Semi-strict
+        4. Strict
+        5. Single user message
+
+        <Note>Some post-processing modes remove tool calls. Avoid tool-dependent presets unless the model and prompt format support them.</Note>
+      </Step>
+      <Step title="Verify">
+        Use the connection test button if available, then send a short message in a new chat.
+      </Step>
+    </Steps>
+
+    **Recommended settings**
+
+    - Enable streaming when the model supports it.
+    - Match context length to the selected model.
+    - Disable unsupported parameters if a request returns a validation error.
+    - Keep character, lorebook, and memory content within the model's context window.
+
+    **Troubleshooting**
+
+    - **Duplicated paths** (`/v1/chat/completions/chat/completions`): a full endpoint was pasted where SillyTavern expected a base URL — use only `https://api.volink.org/v1`.
+    - `401`: the API key is missing or invalid.
+    - `404`: the model ID or endpoint path is wrong.
+    - **Cut-off replies:** increase the response token limit or shorten the context.
+    - **API unavailable warning but test messages work:** use **Bypass API status check**.
+  </Accordion>
+
+  <Accordion title="RiseAI">
+    RiseAI connects to Volink when it supports OpenAI-compatible custom API settings. Use the base URL or full endpoint format depending on which field your RiseAI build exposes.
+
+    <Steps>
+      <Step title="Open provider settings">
+        Open RiseAI and navigate to its provider or API connection settings.
+      </Step>
+      <Step title="Configure the provider">
+        Enter:
+
+        - **Provider:** OpenAI-compatible
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model:** a Volink-enabled chat model ID
+
+        If RiseAI requires a full endpoint URL, use:
+
+        ```text
+        https://api.volink.org/v1/chat/completions
+        ```
+
+        <Warning>Do not put the full `/chat/completions` endpoint in a field that already appends that path automatically.</Warning>
+      </Step>
+      <Step title="Choose a suitable model">
+        Select a model with enough context for your role-play scenario, character instructions, and conversation history.
+      </Step>
+      <Step title="Verify">
+        Create a test conversation and send a short prompt. A reply from the assistant confirms Volink is connected.
+      </Step>
+    </Steps>
+
+    **Recommended settings**
+
+    - Enable streaming when available.
+    - Keep character prompts and memory within the selected model's context window.
+    - Start with standard OpenAI Chat Completions parameters before enabling advanced sampling options.
+    - Use a separate Volink API key for RiseAI if the device or account is shared.
+
+    **Troubleshooting**
+
+    - **Model parameters fail:** remove unsupported sampling options and retry.
+    - **Responses too short:** adjust the app's response length setting.
+    - **Model not in picker:** add the exact Volink model ID manually.
+  </Accordion>
+
+</AccordionGroup>

@@ -1,0 +1,76 @@
+---
+title: "如何对 Volink API 请求进行身份验证"
+description: "将您的 Volink API 密钥作为 Bearer 令牌传递给 OpenAI 兼容端点,或使用 x-api-key 标头用于 Anthropic Messages 协议。"
+---
+
+每个发送到 Volink API 的请求都必须包含您的 API 密钥。标头格式取决于您使用的 API 协议。对于大多数端点,您将密钥作为 Bearer 令牌传递。Anthropic Messages 协议使用不同的标头约定。
+
+<Warning>
+  切勿在客户端代码、浏览器脚本或公共仓库中暴露您的 API 密钥。请像对待密码一样对待它。如果密钥泄露,请在 **Settings → API Keys** 中删除它并创建新密钥。
+</Warning>
+
+## 标准身份验证 (OpenAI 协议)
+
+所有 OpenAI 兼容端点 —— 包括聊天补全、文本转语音和图像生成 —— 都使用 `Authorization: Bearer` 标头。
+
+```http
+Authorization: Bearer YOUR_VOLINK_API_KEY
+Content-Type: application/json
+```
+
+## 协议特定标头
+
+<Tabs>
+  <Tab title="OpenAI 协议">
+    调用 `/v1/chat/completions`、`/v1/audio/speech`、`/v1/images/generations` 和所有其他 OpenAI 兼容端点时,使用以下标头。
+
+    ```http
+    Authorization: Bearer YOUR_VOLINK_API_KEY
+    Content-Type: application/json
+    ```
+
+    **示例请求:**
+
+    ```bash
+    curl "https://api.volink.org/v1/chat/completions" \
+      -H "Authorization: Bearer $VOLINK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "model": "gpt-4.1",
+        "messages": [{"role": "user", "content": "Hello"}]
+      }'
+    ```
+  </Tab>
+
+  <Tab title="Anthropic 协议">
+    调用 Anthropic Messages 端点 (`/v1/messages`) 时,使用以下标头。此协议需要 `x-api-key` 和 `anthropic-version` 标头,而不是 `Authorization`。
+
+    ```http
+    x-api-key: YOUR_VOLINK_API_KEY
+    anthropic-version: 2023-06-01
+    content-type: application/json
+    ```
+
+    **示例请求:**
+
+    ```bash
+    curl "https://api.volink.org/v1/messages" \
+      -H "x-api-key: $VOLINK_API_KEY" \
+      -H "anthropic-version: 2023-06-01" \
+      -H "content-type: application/json" \
+      -d '{
+        "model": "claude-sonnet-4.5",
+        "max_tokens": 512,
+        "messages": [{"role": "user", "content": "Hello"}]
+      }'
+    ```
+
+    <Note>
+      如果您的 HTTP 客户端或 SDK 使用 Bearer 身份验证且无法设置自定义标头,Volink 也接受将 `Authorization: Bearer YOUR_VOLINK_API_KEY` 用于 Anthropic 协议。在单个请求中始终保持一种身份验证方式。
+    </Note>
+  </Tab>
+</Tabs>
+
+## 获取 API 密钥
+
+要创建 API 密钥,请前往 Volink 账户左侧边栏的 **API Keys** 并点击 **Create API Key**。请参阅 [API 密钥](/account/api-keys) 获取分步说明。

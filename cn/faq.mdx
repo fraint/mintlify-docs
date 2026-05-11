@@ -1,0 +1,148 @@
+---
+title: "Volink 常见问题:账户、计费、模型和 API 密钥"
+description: "关于 Volink 账户设置、计费、支持的模型、API 密钥、语音功能和错误代码故障排除的常见问题。"
+---
+
+查找有关使用 Volink 的常见问题的答案,包括账户设置、支付、语音功能和支持的模型。如果您找不到所需内容,请联系技术支持。
+
+## 账户与登录
+
+<AccordionGroup>
+  <Accordion title="如何登录 Volink?">
+    点击右上角的 **Log In**,输入您的**邮箱地址**和**验证码**,然后点击 **Log In**。
+  </Accordion>
+
+  <Accordion title="如何查看我的点数消耗?">
+    在左侧边栏中点击 **Account** 下的 **Points**,点击 **Usage**,然后选择**开始日期**和**结束日期**以查看您的点数消耗历史。
+  </Accordion>
+
+  <Accordion title="如何购买点数?">
+    点击 **Top Up**,然后选择您想要的**套餐**。
+  </Accordion>
+
+  <Accordion title="Volink 支持哪些付款方式?">
+    您可以使用**信用卡**或**支付宝**支付套餐费用。
+  </Accordion>
+</AccordionGroup>
+
+## 模型与 API
+
+<AccordionGroup>
+  <Accordion title="Volink 支持哪些平台和提供商?">
+    Volink 目前支持以下主流平台:
+
+    - Anthropic
+    - BytePlus
+    - DeepSeek
+    - Google
+    - MiniMax
+    - MoonshotAI
+    - OpenAI
+    - Qwen
+    - Z.AI
+    - X.AI
+  </Accordion>
+
+  <Accordion title="Volink 支持哪些模型?">
+    **文本模型**
+
+    - Claude (Haiku / Opus / Sonnet)
+    - Doubao
+    - DeepSeek (R1 / V3)
+    - Gemini
+    - MiniMax
+    - Kimi
+    - GPT
+    - Qwen
+    - GLM4.6
+    - Grok
+
+    **语音模型**
+
+    - MiniMax: Speech 02 Turbo
+    - ByteDance: Open Speech TTS v3
+    - SenseTime: Daily Innovation TTS v1
+    - CosyVoice2-0.5B
+  </Accordion>
+
+  <Accordion title="如何获取用于文本和语音的 API 密钥?">
+    单个 API 密钥可访问所有 Volink 文本和语音模型。
+
+    1. 在左侧边栏中点击 **API Keys**。
+    2. 点击蓝色的 **Create API Key** 按钮。
+    3. 在弹出窗口中输入**密钥名称**,然后点击 **Create** 生成密钥。
+
+    <Warning>
+      创建后立即复制并保存您的 API 密钥 —— 您将无法再次查看它。
+    </Warning>
+
+    您可以为不同的项目或环境创建多个 API 密钥。
+  </Accordion>
+</AccordionGroup>
+
+## 语音功能
+
+<AccordionGroup>
+  <Accordion title="如何创建语音混合 (Voice Mix)?">
+    语音混合结合了多个语音角色,以创建独特的对话效果。
+
+    1. 点击 **Create My Voice**。
+    2. 点击 **Voice Mix**。
+    3. 输入**名称**并选择**语音模型**。
+    4. 点击 **Add Voice**。
+    5. 选择语言和性别。
+    6. 输入**预览文本**。
+    7. 点击 **Save**。
+
+    要进行更高的自定义,请在语音混合页面打开 **Settings** 以调整精确参数。
+  </Accordion>
+
+  <Accordion title="如何创建文本设计语音 (Text-Designed Voice)?">
+    文本设计语音使用文本描述生成自定义语音。
+
+    1. 点击 **Create My Voice**。
+    2. 点击 **Text-Designed Voice**。
+    3. 输入**名称**并选择**语音模型**。
+    4. 输入**描述语音的提示词**。
+    5. 输入**预览文本**。
+    6. 点击 **Save & Activate**。
+  </Accordion>
+
+  <Accordion title="如何创建语音克隆 (Voice Clone)?">
+    语音克隆从录制的音频样本中复制音调,以重新创建自定义语音。
+
+    1. 点击 **Create My Voice**。
+    2. 点击 **Voice Clone**。
+    3. 输入**名称**并选择**语音模型**。
+    4. 上传**音频文件**。
+    5. 选择语言和性别。
+    6. 输入**预览文本**。
+    7. 点击 **Save & Activate**。
+  </Accordion>
+</AccordionGroup>
+
+## 故障排除
+
+<AccordionGroup>
+  <Accordion title="错误代码 401 是什么意思?">
+    `401` 状态代码表示您的请求未经授权。请验证您的 API 密钥是否正确,并已包含在 `Authorization` 标头中,格式为 `Bearer YOUR_VOLINK_API_KEY`。
+  </Accordion>
+
+  <Accordion title="错误代码 404 是什么意思?">
+    `404` 状态代码表示未找到端点、模型或资源。请检查请求中的端点路径和模型 ID。
+
+    对于语音请求,请确认您账户中存在该语音 ID。
+  </Accordion>
+
+  <Accordion title="错误代码 429 是什么意思?">
+    `429` 状态代码表示您已超出当前配额。请检查您的套餐和计费详情,或通过账户中的 **Top Up** 购买更多点数。
+  </Accordion>
+
+  <Accordion title="温度超出范围错误是什么意思?">
+    此错误在 `temperature` 值超出可接受范围时发生。将 `temperature` 设置为 **0** 到 **1** 之间的值。
+
+    <Note>
+      不同的模型可能有不同的温度范围。请参阅模型文档以了解确切的支持范围。
+    </Note>
+  </Accordion>
+</AccordionGroup>

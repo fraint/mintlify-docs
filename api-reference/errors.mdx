@@ -1,0 +1,38 @@
+---
+title: "Volink API Error Codes and Status Code Reference"
+description: "Complete reference for Volink HTTP status codes, error response structure, and guidance on handling rate limits, auth failures, and upstream errors."
+---
+
+Volink returns standard HTTP status codes on every response. When a request fails, the response body contains a JSON object with an `error` field that describes what went wrong.
+
+## Error response format
+
+```json
+{
+  "error": {
+    "message": "Invalid model.",
+    "type": "invalid_request_error",
+    "code": "model_not_found"
+  }
+}
+```
+
+## Status codes
+
+| Status | Meaning |
+| --- | --- |
+| `400` | Invalid request. Check your request body for missing or malformed fields. |
+| `401` | Missing or invalid API key. Verify the key in your `Authorization` or `x-api-key` header. |
+| `402` | Insufficient quota. Add credits to your Volink account to continue. |
+| `403` | The API key does not have access to the requested model or feature. |
+| `404` | Endpoint, model, or resource not found. Confirm the path and model ID are correct. |
+| `429` | Rate limit exceeded. Back off and retry after a short delay. |
+| `500` | Internal server error. If the issue persists, contact Volink support. |
+| `503` | Upstream provider unavailable or overloaded. Retry with exponential backoff. |
+
+## Notes
+
+- Parameter support can vary by model and upstream provider. If a parameter is ignored or unsupported, the request may still succeed without applying that option.
+- Streaming responses use server-sent events when supported. If your client does not handle SSE correctly, disable streaming and poll for results instead.
+- Some model IDs in examples are illustrative. Replace them with the model IDs enabled in your Volink account.
+- For provider-specific behavior, Volink follows the selected protocol as closely as possible while normalizing authentication and routing.

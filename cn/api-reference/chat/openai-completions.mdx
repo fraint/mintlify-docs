@@ -1,0 +1,171 @@
+---
+title: "POST /v1/chat/completions —— OpenAI 聊天协议"
+description: "使用 OpenAI 聊天补全协议将聊天消息发送到任何 Volink 支持的模型,支持流式传输、工具和结构化输出。"
+---
+
+`/v1/chat/completions` 端点遵循 OpenAI 聊天补全协议,并可与任何 OpenAI 兼容客户端或 SDK 一起使用。将客户端指向 `https://api.volink.org` 并使用您的 Volink API 密钥,然后像使用 OpenAI API 一样使用它。
+
+## 端点
+
+```http
+POST /v1/chat/completions
+```
+
+## 请求参数
+
+<ParamField body="model" type="string" required>
+  要使用的模型 ID。将示例值替换为您 Volink 账户中已启用的模型 ID。
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  对话消息。每个项目都是一个对象,带有 `role`(`system`、`user` 或 `assistant`)和 `content` 字符串。
+</ParamField>
+
+<ParamField body="temperature" type="number">
+  采样温度。较高的值产生更多样化的输出;较低的值产生更确定的输出。
+</ParamField>
+
+<ParamField body="top_p" type="number">
+  核采样值。模型仅考虑包含顶部 `top_p` 概率质量的 token。
+</ParamField>
+
+<ParamField body="max_tokens" type="integer">
+  要生成的最大 token 数。某些模型可能改用 `max_completion_tokens`。
+</ParamField>
+
+<ParamField body="stream" type="boolean">
+  设置为 `true` 以接收服务器发送事件流形式的响应,而不是单个 JSON 对象。
+</ParamField>
+
+<ParamField body="tools" type="array">
+  对模型可用的工具和函数定义。每个项目描述一个可调用函数,带有名称、描述和参数 schema。
+</ParamField>
+
+<ParamField body="tool_choice" type="string | object">
+  控制模型是否以及如何选择工具。传递 `"auto"`、`"none"` 或指定特定函数的对象。
+</ParamField>
+
+<ParamField body="response_format" type="object">
+  模型支持时的结构化输出或 JSON 模式配置。传递 `{ "type": "json_object" }` 以启用 JSON 模式。
+</ParamField>
+
+## 示例
+
+<Tabs>
+  <Tab title="标准请求">
+    ```bash
+    curl "$VOLINK_BASE_URL/v1/chat/completions" \
+      -H "Authorization: Bearer $VOLINK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "model": "gpt-4.1",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a helpful assistant."
+          },
+          {
+            "role": "user",
+            "content": "Explain Volink in one sentence."
+          }
+        ],
+        "temperature": 0.7
+      }'
+    ```
+  </Tab>
+  <Tab title="流式请求">
+    ```bash
+    curl "$VOLINK_BASE_URL/v1/chat/completions" \
+      -H "Authorization: Bearer $VOLINK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "model": "gpt-4.1",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Write a short haiku about APIs."
+          }
+        ],
+        "stream": true
+      }'
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  当 `stream` 为 `true` 时,服务器发送一系列服务器发送事件。每个事件包含一个 JSON delta。流以 `data: [DONE]` 消息结束。确保您的 HTTP 客户端支持 SSE 或逐行读取原始响应。
+</Note>
+
+## 响应
+
+```json
+{
+  "id": "chatcmpl_xxx",
+  "object": "chat.completion",
+  "created": 1710000000,
+  "model": "openai/gpt-4.1",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Volink lets developers access multiple AI models through unified APIs."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 20,
+    "completion_tokens": 12,
+    "total_tokens": 32
+  }
+}
+```
+
+<ResponseField name="id" type="string">
+  补全的唯一标识符。
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  对于非流式响应,始终为 `"chat.completion"`。
+</ResponseField>
+
+<ResponseField name="created" type="integer">
+  创建补全时的 Unix 时间戳。
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  生成响应的模型,带有提供商前缀。
+</ResponseField>
+
+<ResponseField name="choices" type="array">
+  补全选项数组。每个项目包含 `index`、`message` 对象和 `finish_reason`。
+
+  <Expandable title="properties">
+    <ResponseField name="choices[].index" type="integer">
+      此选择的从零开始的索引。
+    </ResponseField>
+    <ResponseField name="choices[].message" type="object">
+      助手消息。包含 `role`(`"assistant"`)和 `content`(生成的文本)。
+    </ResponseField>
+    <ResponseField name="choices[].finish_reason" type="string">
+      生成停止的原因。常见值:`"stop"`、`"length"`、`"tool_calls"`。
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="usage" type="object">
+  用于计费和监控的 token 计数。
+
+  <Expandable title="properties">
+    <ResponseField name="usage.prompt_tokens" type="integer">
+      输入消息消耗的 token 数。
+    </ResponseField>
+    <ResponseField name="usage.completion_tokens" type="integer">
+      响应中生成的 token 数。
+    </ResponseField>
+    <ResponseField name="usage.total_tokens" type="integer">
+      提示和补全 token 的总和。
+    </ResponseField>
+  </Expandable>
+</ResponseField>

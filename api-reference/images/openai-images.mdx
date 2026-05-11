@@ -1,0 +1,109 @@
+---
+title: "POST /v1/images/generations — Image Generation"
+description: "Generate images from text prompts using Volink's OpenAI-compatible image endpoint, with control over size, quality, format, background, and moderation."
+---
+
+The `/v1/images/generations` endpoint follows the OpenAI Images API protocol. Pass a model ID and a text prompt, and the endpoint returns one or more generated images as base64-encoded data or URLs depending on the model and provider.
+
+## Endpoint
+
+```http
+POST /v1/images/generations
+```
+
+## Request parameters
+
+<ParamField body="model" type="string" required>
+  Image model ID, such as `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`, or `gpt-image-1-mini`.
+</ParamField>
+
+<ParamField body="prompt" type="string" required>
+  Text prompt describing the image you want to generate.
+</ParamField>
+
+<ParamField body="n" type="integer">
+  Number of images to generate. Defaults to `1` when not specified.
+</ParamField>
+
+<ParamField body="size" type="string">
+  Output dimensions, for example `1024x1024`. Supported values depend on the model — check your model's documentation for valid sizes.
+</ParamField>
+
+<ParamField body="quality" type="string">
+  Output quality level, such as `low`, `medium`, or `high`. Availability depends on model support.
+</ParamField>
+
+<ParamField body="background" type="string">
+  Background mode, such as `transparent`, when supported by the model.
+</ParamField>
+
+<ParamField body="moderation" type="string">
+  Moderation strictness setting for supported GPT Image models.
+</ParamField>
+
+<ParamField body="output_format" type="string">
+  Output image format when supported, such as `png`, `jpeg`, or `webp`.
+</ParamField>
+
+<Note>
+  Supported values for `size` and `quality` vary by model. Passing an unsupported combination may result in a `400` error or the parameter being ignored. Consult your Volink account's model list for per-model capabilities.
+</Note>
+
+## Example
+
+```bash
+curl "$VOLINK_BASE_URL/v1/images/generations" \
+  -H "Authorization: Bearer $VOLINK_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "openai/gpt-image-2",
+    "prompt": "A clean hero illustration for an AI API platform called Volink.",
+    "size": "1024x1024",
+    "quality": "medium"
+  }'
+```
+
+## Response
+
+Most models return images as base64-encoded data:
+
+```json
+{
+  "created": 1710000000,
+  "data": [
+    {
+      "b64_json": "base64_encoded_image_data"
+    }
+  ]
+}
+```
+
+Some compatible models or providers may return a URL instead:
+
+```json
+{
+  "created": 1710000000,
+  "data": [
+    {
+      "url": "https://example.com/generated-image.png"
+    }
+  ]
+}
+```
+
+<ResponseField name="created" type="integer">
+  Unix timestamp of when the image was generated.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Array of generated image objects. Each item contains either a `b64_json` field with base64-encoded image data or a `url` field with a link to the image.
+
+  <Expandable title="properties">
+    <ResponseField name="data[].b64_json" type="string">
+      Base64-encoded image data. Decode this string to get the raw image bytes.
+    </ResponseField>
+    <ResponseField name="data[].url" type="string">
+      URL pointing to the generated image. Availability depends on the model and provider.
+    </ResponseField>
+  </Expandable>
+</ResponseField>

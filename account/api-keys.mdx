@@ -1,0 +1,39 @@
+---
+title: "Create and Manage API Keys in Your Volink Account"
+description: "Learn how to generate, organize, and revoke Volink API keys to authenticate your requests across all supported text and voice models."
+---
+
+A Volink API key is the credential that authenticates every request you send to the Volink gateway. One key grants access to all Volink text and voice models, so you only need to manage a single credential to use the full platform.
+
+## Create an API key
+
+<Steps>
+  <Step title="Open API Keys">
+    Click **API Keys** in the left sidebar of your Volink dashboard.
+  </Step>
+  <Step title="Start key creation">
+    Click the blue **Create API Key** button at the top of the page.
+  </Step>
+  <Step title="Name your key">
+    Enter a descriptive name for the key in the pop-up dialog, then click **Create**.
+  </Step>
+  <Step title="Copy and save the key">
+    Copy the generated key string immediately and store it in a secure location such as a password manager or secrets vault.
+  </Step>
+</Steps>
+
+<Note>
+  You cannot view the key again after closing the creation dialog. Copy it before you close the pop-up — if you lose it, you will need to create a new key.
+</Note>
+
+## Multiple API keys
+
+You can create as many API keys as your workflow requires. A common pattern is to create one key per project or per environment — for example, a `production` key and a `development` key — so that you can revoke or rotate credentials for one context without affecting others.
+
+## Revoking keys
+
+Delete any key you no longer need. Open **API Keys** in the sidebar, locate the key in the list, and use the delete action next to it. Revoking unused keys reduces the attack surface if a key is ever exposed.
+
+<Warning>
+  Never share API keys with others, paste them into chat, or commit them to version control. Store keys in environment variables or a secrets manager so they stay out of your source code.
+</Warning>

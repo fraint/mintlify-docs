@@ -1,0 +1,45 @@
+---
+title: "Volink REST API 参考:聊天、TTS 和图像"
+description: "探索 Volink 兼容 OpenAI 和 Anthropic 的 REST API,用于聊天、文本转语音和图像生成 —— 全部使用一个 API 密钥。"
+---
+
+Volink 提供与 OpenAI 兼容和与 Anthropic 兼容的 REST API,用于聊天补全、文本转语音和图像生成。您在所有协议中使用相同的 Volink API 密钥,所有请求都发送到相同的基础 URL:`https://api.volink.org`。
+
+## 设置您的环境
+
+在运行本参考中的任何示例之前,请导出您的凭证:
+
+```bash
+export VOLINK_API_KEY="your_api_key"
+export VOLINK_BASE_URL="https://api.volink.org"
+```
+
+## 可用端点
+
+| 端点 | 协议 | 描述 |
+| --- | --- | --- |
+| `POST /v1/chat/completions` | OpenAI 兼容 | 聊天补全 |
+| `POST /v1/messages` | Anthropic 兼容 | 聊天消息 |
+| `POST /v1/audio/speech` | OpenAI 兼容 | 文本转语音 |
+| `POST /v1/tts/speech` | Volink 原生 | 文本转语音 |
+| `POST /v1/images/generations` | OpenAI 兼容 | 图像生成 |
+| `GET /v1/models` | OpenAI 兼容 | 列出可用模型 |
+
+有关如何对请求进行身份验证的详细信息,请参阅 [身份验证](/api-reference/authentication)。有关错误代码和响应格式的完整列表,请参阅 [错误](/api-reference/errors)。
+
+## 按部分浏览
+
+<CardGroup cols={2}>
+  <Card title="聊天" icon="message" href="/api-reference/chat/openai-completions">
+    OpenAI 兼容的聊天补全和用于 Claude 风格负载的 Anthropic Messages 协议。
+  </Card>
+  <Card title="文本转语音" icon="volume-high" href="/api-reference/tts/openai-speech">
+    OpenAI 兼容的语音合成和 Volink 原生 TTS 端点。
+  </Card>
+  <Card title="图像生成" icon="image" href="/api-reference/images/openai-images">
+    OpenAI Images API 和 Volink 通过 modalities 实现的基于聊天的图像生成。
+  </Card>
+  <Card title="错误" icon="triangle-alert" href="/api-reference/errors">
+    HTTP 状态代码、错误响应格式和故障排除指南。
+  </Card>
+</CardGroup>

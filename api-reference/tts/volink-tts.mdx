@@ -1,0 +1,33 @@
+---
+title: "POST /v1/tts/speech — Volink Native TTS Endpoint"
+description: "Volink's native text-to-speech endpoint with Volink-specific quota error handling and full support for custom voice IDs including clones and mixes."
+---
+
+Volink's native TTS endpoint is functionally similar to the OpenAI-compatible `/v1/audio/speech`, with Volink-specific behavior for quota errors. Use this endpoint when you want explicit `402` responses for insufficient quota rather than the default upstream error behavior.
+
+## Endpoint
+
+```http
+POST /v1/tts/speech
+```
+
+<Note>
+  Unlike `/v1/audio/speech`, this endpoint returns a `402 Insufficient quota` status code when your account does not have enough credits to complete the request. This makes it easier to detect and handle quota exhaustion programmatically without parsing error message strings.
+</Note>
+
+## Parameters
+
+For the complete parameter reference — including `model`, `input`, `voice`, `response_format`, `speed`, and `instructions` — see the [OpenAI-compatible speech endpoint](/api-reference/tts/openai-speech). This endpoint accepts the same request body.
+
+<Note>
+  You can use any Volink voice ID with this endpoint, including custom voices created through Volink's voice features: voice mix, text-designed voice, and voice clone. Retrieve your available voice IDs from your Volink account.
+</Note>
+
+## Authentication
+
+Use standard bearer authentication:
+
+```http
+Authorization: Bearer YOUR_VOLINK_API_KEY
+Content-Type: application/json
+```

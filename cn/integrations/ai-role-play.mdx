@@ -1,0 +1,253 @@
+---
+title: "将 Volink 与 AI 角色扮演应用集成"
+description: "通过 OpenAI 兼容 API 将 Volink 与角色聊天和角色扮演平台集成。涵盖 Tavo、Janitor AI、SillyTavern 和 RiseAI。"
+---
+
+Volink 通过其 OpenAI 兼容 API 与 AI 角色扮演和角色聊天平台集成。在任何支持的应用中设置您的 Volink 基础 URL 和 API 密钥,选择一个具有足够上下文用于您的角色定义的模型,并通过 Volink 路由所有推理。
+
+<AccordionGroup>
+
+  <Accordion title="Tavo">
+    Tavo 内置了对 Volink 的支持。在 Tavo 的 API 连接流程中使用原生的 **Volink** 模型平台选项 —— 不需要自定义基础 URL。
+
+    <Steps>
+      <Step title="获取 Volink API 密钥">
+        在配置 Tavo 之前:
+
+        1. 在 [volink.org](https://volink.org) 登录。
+        2. 打开 Volink 控制台并转到 **API Keys**。
+        3. 创建新密钥并安全存储。
+        4. 确认您要使用的模型 ID 已为您的账户启用。
+      </Step>
+      <Step title="打开 API Connection">
+        打开 Tavo,点击蓝色的 **API Connection** 按钮,或打开菜单栏并点击 **API Connection**。
+      </Step>
+      <Step title="添加新连接">
+        点击 **Add New**。在 **Model Platform** 中,选择 **Volink**。
+      </Step>
+      <Step title="输入您的凭证">
+        填写:
+
+        | Tavo 字段 | Volink 值 |
+        |---|---|
+        | API Key | 您的 Volink API 密钥 |
+        | Model Platform | `Volink` |
+        | Model | 选择 Tavo 中可用的 Volink 模型 |
+
+        点击 **Save**。如果 Tavo 显示 `Saved Successfully`,则连接已建立。
+      </Step>
+      <Step title="将 Volink 设为默认">
+        打开 **API Connection**,点击 Volink 连接旁边的菜单图标,选择 **Set as default**,然后开始或重新打开角色聊天。
+      </Step>
+    </Steps>
+
+    **后备方案:Custom OpenAI Protocol**
+
+    如果原生 **Volink** 平台选项在您的 Tavo 版本中不可用,请使用后备方案:
+
+    | Tavo 字段 | Volink 值 |
+    |---|---|
+    | Model Platform | `Custom (OpenAI Protocol)` |
+    | API Key | 您的 Volink API 密钥 |
+    | API Base URL / Custom Endpoint | `https://api.volink.org/v1` |
+    | Model Name | Volink 启用的模型 ID |
+
+    <Warning>请勿在自定义端点字段中输入 `https://api.volink.org/v1/chat/completions`。仅使用 `/v1` 基础 URL。</Warning>
+
+    **模型参数**
+
+    Tavo 在两个位置支持模型参数配置:
+
+    - **全局设置:** 打开左侧边栏 → **More** → **Settings** → **Model Settings**
+    - **API 连接设置:** 打开 **API Connection**,找到 Volink 连接,点击 **Parameter Settings**
+
+    API 连接设置优先于全局设置。从保守值开始:
+
+    - 如果可用,启用流式传输。
+    - 将 **Reply Token Limit** 设置在所选模型的输出限制内。
+    - 将 **Context Memory Length** 设置在模型的上下文窗口内。
+    - 使用所选模型支持的 `Temperature`、`Top-P` 和 `Top-K` 值。
+
+    如果高级采样参数导致 API 错误,请将其删除或恢复为模型的默认值。
+
+    **提示词兼容性**
+
+    如果在使用 Custom OpenAI Protocol 后备方案时所选模型拒绝请求格式,请尝试 Tavo 的内置提示词转换器 —— 使用修复错误的最不受限制的转换器:
+
+    - 合并来自同一角色的连续消息
+    - 仅允许一条系统消息
+    - 允许一条可选的系统消息,并要求用户角色排在首位
+
+    **验证**
+
+    1. 将 Volink 连接设为默认。
+    2. 打开角色聊天。
+    3. 发送简短的测试消息并确认角色返回响应。
+
+    **故障排除**
+
+    - **API 密钥无效:** 完全准确地复制密钥,没有前导或尾随空格。
+    - **连接失败(原生 Volink):** 确认 **Model Platform** 设置为 `Volink` 且密钥有效。
+    - **连接失败(自定义后备):** 确认端点为 `https://api.volink.org/v1`,而不是完整的 `/chat/completions` URL。
+    - **模型名称错误:** 在 Tavo 的 Volink 模型列表中选择可用模型,或在自定义后备中使用精确的 Volink 模型 ID。
+    - **空的模型响应:** 尝试在 Tavo 模型设置中禁用流式传输。
+    - **请求大小超出:** 减少 **Context Memory Length**。
+    - **回复过短:** 在模型支持的范围内增加 **Reply Token Limit**。
+    - **网络问题:** 确认您的设备可以访问 `https://api.volink.org`。
+  </Accordion>
+
+  <Accordion title="Janitor AI">
+    当所选连接模式支持 OpenAI 兼容自定义端点时,Janitor AI 可使用 Volink。许多 Janitor AI 代理指南使用完整的聊天补全 URL,而不仅仅是 `/v1` 基础 URL。
+
+    <Steps>
+      <Step title="打开 AI Providers 设置">
+        打开 Janitor AI 设置并导航到 **AI Providers** 或自定义 API 配置面板。
+      </Step>
+      <Step title="选择提供商类型">
+        根据您账户中的 UI 标签,选择 **Custom**、**Proxy** 或 **OpenAI Compatible**。
+      </Step>
+      <Step title="配置端点">
+        如果 Janitor AI 显示单个代理 URL 字段,请使用:
+
+        ```text
+        https://api.volink.org/v1/chat/completions
+        ```
+
+        如果它有用于基础 URL 和端点的单独字段,请使用:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **Endpoint:** `chat/completions`
+
+        然后设置:
+
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** Volink 启用的聊天模型 ID
+      </Step>
+      <Step title="验证">
+        开始测试聊天并发送简单的问候。成功的回复确认 Janitor AI 正在通过 Volink 路由。
+      </Step>
+    </Steps>
+
+    **推荐设置**
+
+    - 使用具有足够大上下文窗口的模型来容纳您的角色定义。
+    - 对于交互式聊天,保持最大响应长度适中。
+    - 如果请求失败,禁用不受支持的提供商特定选项。
+
+    **故障排除**
+
+    - **身份验证错误:** 密钥可能复制错误。
+    - **模型错误:** 所选模型未在 Volink 中启用。
+    - **回复被截断:** 增加响应 token 限制或减少提示上下文。
+    - **保存后 Janitor AI 从未调用 Volink:** 硬刷新浏览器或重新打开聊天会话。
+    - **重复路径:** 从完整端点切换到单独的基础 URL 和端点字段。
+  </Accordion>
+
+  <Accordion title="SillyTavern">
+    SillyTavern 通过 **Chat Completion** API 模式和 **Custom (OpenAI-compatible)** 源连接到 Volink。请勿在自定义端点字段中附加 `/chat/completions` —— SillyTavern 会自动附加该路径。
+
+    <Steps>
+      <Step title="打开 API Connections">
+        打开 SillyTavern 并导航到 **API Connections**。
+      </Step>
+      <Step title="设置 API 类型">
+        将 **API type** 设置为 `Chat Completion`,并将 **Chat Completion Source** 设置为 `Custom (OpenAI-compatible)`。
+      </Step>
+      <Step title="输入 Volink 凭证">
+        输入:
+
+        - **Custom endpoint URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** Volink 启用的聊天模型 ID
+
+        <Warning>请勿向自定义端点字段添加 `/chat/completions`。SillyTavern 会自动附加该路径。</Warning>
+      </Step>
+      <Step title="选择模型">
+        如果您的账户可使用 Volink 模型发现,SillyTavern 会从 `/v1/models` 填充下拉菜单。否则,请手动输入模型 ID。
+
+        选择具有足够上下文用于以下内容的模型:
+
+        - 角色卡
+        - 作者注释
+        - 知识库条目
+        - 记忆
+        - 最近的聊天历史
+      </Step>
+      <Step title="配置提示词后处理(如果需要)">
+        如果所选模型拒绝消息顺序或系统消息布局,请使用 SillyTavern 的提示词后处理选项。从限制最少的开始,仅在端点返回格式错误时收紧:
+
+        1. None
+        2. Merge consecutive messages
+        3. Semi-strict
+        4. Strict
+        5. Single user message
+
+        <Note>某些后处理模式会删除工具调用。除非模型和提示词格式支持,否则请避免依赖工具的预设。</Note>
+      </Step>
+      <Step title="验证">
+        如果可用,请使用连接测试按钮,然后在新聊天中发送简短消息。
+      </Step>
+    </Steps>
+
+    **推荐设置**
+
+    - 当模型支持时,启用流式传输。
+    - 将上下文长度与所选模型匹配。
+    - 如果请求返回验证错误,禁用不支持的参数。
+    - 将角色、知识库和记忆内容保持在模型的上下文窗口内。
+
+    **故障排除**
+
+    - **重复路径** (`/v1/chat/completions/chat/completions`):完整端点被粘贴到 SillyTavern 期望基础 URL 的位置 —— 仅使用 `https://api.volink.org/v1`。
+    - `401`:API 密钥缺失或无效。
+    - `404`:模型 ID 或端点路径错误。
+    - **截断的回复:** 增加响应 token 限制或缩短上下文。
+    - **API 不可用警告但测试消息有效:** 使用 **Bypass API status check**。
+  </Accordion>
+
+  <Accordion title="RiseAI">
+    当 RiseAI 支持 OpenAI 兼容自定义 API 设置时,它可连接到 Volink。根据您的 RiseAI 版本公开的字段,使用基础 URL 或完整端点格式。
+
+    <Steps>
+      <Step title="打开提供商设置">
+        打开 RiseAI 并导航到其提供商或 API 连接设置。
+      </Step>
+      <Step title="配置提供商">
+        输入:
+
+        - **Provider:** OpenAI-compatible
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** Volink 启用的聊天模型 ID
+
+        如果 RiseAI 需要完整端点 URL,请使用:
+
+        ```text
+        https://api.volink.org/v1/chat/completions
+        ```
+
+        <Warning>请勿将完整的 `/chat/completions` 端点放入会自动附加该路径的字段中。</Warning>
+      </Step>
+      <Step title="选择合适的模型">
+        选择具有足够上下文用于您的角色扮演场景、角色说明和对话历史的模型。
+      </Step>
+      <Step title="验证">
+        创建测试对话并发送简短提示。来自助手的回复确认 Volink 已连接。
+      </Step>
+    </Steps>
+
+    **推荐设置**
+
+    - 当可用时启用流式传输。
+    - 将角色提示词和记忆保持在所选模型的上下文窗口内。
+    - 在启用高级采样选项之前,先从标准 OpenAI Chat Completions 参数开始。
+    - 如果设备或账户共享,请为 RiseAI 使用单独的 Volink API 密钥。
+
+    **故障排除**
+
+    - **模型参数失败:** 删除不支持的采样选项并重试。
+    - **响应太短:** 调整应用的响应长度设置。
+    - **选择器中没有模型:** 手动添加精确的 Volink 模型 ID。
+  </Accordion>
+
+</AccordionGroup>

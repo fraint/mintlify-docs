@@ -1,0 +1,610 @@
+---
+title: "将 Volink 与 AI 编码代理和工具集成"
+description: "使用一个 API 密钥通过 Volink 路由 AI 编码代理。涵盖 Claude Code、Cline、Roo Code、Kilo Code、OpenClaw、Hermes、Codex CLI、OpenCode、Cursor 和 Kiro。"
+---
+
+Volink 通过其 OpenAI 兼容和 Anthropic 兼容的 API 与流行的 AI 编码代理一起工作。将任何支持的代理指向您的 Volink 基础 URL,使用您的 Volink API 密钥进行身份验证,所有模型流量都通过 Volink 路由 —— 无需为每个代理单独建立账户。
+
+<AccordionGroup>
+
+  <Accordion title="Claude Code">
+    Claude Code 通过 Anthropic 兼容的 Messages API 连接到 Volink。在启动代理之前设置三个环境变量。
+
+    **协议:** Anthropic 兼容
+
+    <Steps>
+      <Step title="安装 Claude Code">
+        如果尚未安装 Claude Code,请使用 npm 安装:
+
+        ```bash
+        npm install -g @anthropic-ai/claude-code
+        ```
+      </Step>
+      <Step title="设置环境变量">
+        在运行 `claude` 之前导出以下内容:
+
+        ```bash
+        export ANTHROPIC_BASE_URL="https://api.volink.org"
+        export ANTHROPIC_AUTH_TOKEN="your_volink_api_key"
+        export ANTHROPIC_MODEL="your_model_id"
+        claude
+        ```
+
+        使用 `ANTHROPIC_AUTH_TOKEN` —— Claude Code 将其作为 `Authorization: Bearer` 标头发送,这与 Volink 的 Anthropic 兼容端点匹配。将 `your_model_id` 替换为您 Volink 账户中已启用的模型。
+      </Step>
+      <Step title="持久化配置(可选)">
+        要避免每次会话都导出变量,可将其添加到 `settings.json` 文件:
+
+        ```json
+        {
+          "env": {
+            "ANTHROPIC_BASE_URL": "https://api.volink.org",
+            "ANTHROPIC_AUTH_TOKEN": "your_volink_api_key",
+            "ANTHROPIC_MODEL": "your_model_id"
+          }
+        }
+        ```
+
+        Claude Code 从这些位置读取设置:
+
+        - 用户设置:`~/.claude/settings.json`
+        - 项目设置:`.claude/settings.json`
+        - 本地项目设置:`.claude/settings.local.json`
+
+        将用户设置用于个人设置。仅当整个团队应共享相同的 Volink 路由时才使用项目设置。请勿将真实的 API 密钥提交到仓库。
+      </Step>
+      <Step title="添加自定义模型选择器条目(可选)">
+        如果您的 Volink 模型 ID 未出现在 Claude Code 的模型选择器中,请通过以下方式公开它:
+
+        ```bash
+        export ANTHROPIC_CUSTOM_MODEL_OPTION="your_model_id"
+        export ANTHROPIC_CUSTOM_MODEL_OPTION_NAME="Volink"
+        export ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION="Volink Anthropic-compatible model"
+        ```
+
+        您还可以将这些值放在 `settings.json` 的 `env` 键下。
+      </Step>
+      <Step title="验证">
+        从您的项目目录运行一个快速提示:
+
+        ```bash
+        claude -p "Reply with one short sentence confirming Volink is connected."
+        ```
+
+        成功的回复确认 Claude Code 正在通过 Volink 路由。
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **Claude Code 仍然使用您的 Claude 订阅。** 确认 `ANTHROPIC_BASE_URL` 和 `ANTHROPIC_AUTH_TOKEN` 已在运行 `claude` 的同一 shell 会话中导出。运行 `echo "$ANTHROPIC_BASE_URL"` 和 `echo "$ANTHROPIC_AUTH_TOKEN"` 进行验证。
+    - **身份验证失败。** 检查 API 密钥是否为有效的 Volink 密钥,且没有多余空格。如果您使用 `ANTHROPIC_API_KEY` 而不是 `ANTHROPIC_AUTH_TOKEN`,Claude Code 会将密钥作为 `X-Api-Key` 发送;切换到 `ANTHROPIC_AUTH_TOKEN` 以保持一致的 Bearer 身份验证。
+    - **未找到模型。** 确认 `ANTHROPIC_MODEL` 完全匹配您 Volink 账户中已启用的模型 ID。模型名称区分大小写。
+    - **请求超时。** 增加 API 超时并从同一 shell 重启 Claude Code:
+
+      ```bash
+      export API_TIMEOUT_MS=600000
+      ```
+  </Accordion>
+
+  <Accordion title="Cline">
+    Cline 通过其 OpenAI 兼容的提供商连接到 Volink。在 VS Code UI 或使用 Cline CLI 中配置它。
+
+    **协议:** OpenAI 兼容
+
+    <Tabs>
+      <Tab title="VS Code 扩展">
+        <Steps>
+          <Step title="打开 Cline 设置">
+            在 VS Code 中打开 Cline 面板,然后单击齿轮图标打开设置。
+          </Step>
+          <Step title="选择提供商">
+            将 **API Provider** 设置为 `OpenAI Compatible`。
+          </Step>
+          <Step title="填写提供商字段">
+            输入:
+
+            - **Base URL:** `https://api.volink.org/v1`
+            - **API key:** 您的 Volink API 密钥
+            - **Model:** 您 Volink 账户中已启用的模型 ID
+          </Step>
+          <Step title="配置模型元数据">
+            打开 **Model Configuration** 并设置与所选模型匹配的值:
+
+            - **Max Output Tokens** —— 使用模型支持的输出限制
+            - **Context Window** —— 使用模型支持的上下文长度
+            - **Image Support** —— 仅对支持视觉的模型启用
+            - **Computer Use** —— 仅在您的工作流程需要时启用
+            - **Input Price / Output Price** —— 可选,用于本地成本估算
+          </Step>
+          <Step title="验证">
+            如果您的 Cline 版本显示该按钮,请单击 **Verify**,然后启动一个新任务并提示:
+
+            ```text
+            Create a one-sentence summary of this project without changing files.
+            ```
+          </Step>
+        </Steps>
+      </Tab>
+      <Tab title="CLI">
+        <Steps>
+          <Step title="身份验证">
+            使用 `openai` 提供商 ID 运行 auth 命令:
+
+            ```bash
+            cline auth \
+              -p openai \
+              -k "$VOLINK_API_KEY" \
+              -b "https://api.volink.org/v1" \
+              -m "your_model_id"
+            ```
+          </Step>
+          <Step title="验证">
+            ```bash
+            cline "What is 2 + 2?"
+            ```
+          </Step>
+        </Steps>
+      </Tab>
+    </Tabs>
+
+    **故障排除**
+
+    - **身份验证错误:** 检查 API 密钥是否复制时没有空格。
+    - **未找到模型:** 使用您 Volink 账户中的精确模型 ID。
+    - **端点错误:** 确认基础 URL 包含 `/v1`。
+    - **工具或编辑失败:** 确认 Cline 权限和工作区信任设置。
+    - **验证失败但直接 curl 有效:** 检查 Cline 是否在单独的模型配置字段中具有过时的模型或上下文值。
+  </Accordion>
+
+  <Accordion title="Roo Code">
+    Roo Code 通过其在 VS Code 中的 OpenAI 兼容提供商设置连接到 Volink。配置自定义端点时,请选择 `OpenAI Compatible` 而不是普通的 `OpenAI` 提供商。
+
+    **协议:** OpenAI 兼容
+
+    <Steps>
+      <Step title="打开 Roo Code 设置">
+        在 VS Code 中打开 Roo Code 并导航到其设置面板。
+      </Step>
+      <Step title="选择提供商">
+        选择 OpenAI 兼容提供商。如果同时显示 `OpenAI` 和 `OpenAI Compatible`,请为 Volink 选择 `OpenAI Compatible`。
+      </Step>
+      <Step title="填写提供商字段">
+        输入:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** Volink 启用的聊天模型 ID
+
+        除非您有意为不同的路由,否则请为主模型和任何轻量级模型字段使用相同的模型 ID。
+      </Step>
+      <Step title="选择能力强的模型">
+        Roo Code 依赖工具进行文件读取、命令执行和编辑。选择支持工具和函数调用以进行代理工作流程的 Volink 模型。
+      </Step>
+      <Step title="验证">
+        要求 Roo Code 检查仓库而不编辑文件:
+
+        ```text
+        Summarize the project structure and do not make changes.
+        ```
+      </Step>
+    </Steps>
+
+    **推荐设置**
+
+    - 选择强大的编码模型进行代码编辑和调试。
+    - 启用流式传输以获得更好的交互式反馈。
+    - 在项目配置验证之前,保持自动命令执行禁用。
+    - 当多个团队共享同一个 Volink 账户时,使用项目特定的 API 密钥。
+
+    **故障排除**
+
+    - `401` 或 `403`:验证 Volink 中的 API 密钥和模型访问权限。
+    - `404`:确认模型 ID 和基础 URL。
+    - **缺少工具调用:** 选择支持工具使用的模型,或禁用依赖工具的模式。
+    - **响应缓慢:** 尝试较小的模型或减少上下文。
+    - **使用 OpenAI 提供商类型的自定义端点失败:** 切换到 `OpenAI Compatible`。
+  </Accordion>
+
+  <Accordion title="Kilo Code">
+    Kilo Code 使用其 OpenAI 兼容提供商连接到 Volink。配置需要基础 URL、API 密钥和模型 ID。
+
+    **协议:** OpenAI 兼容
+
+    <Steps>
+      <Step title="打开 Kilo Code 设置">
+        在 VS Code 中打开 Kilo Code 设置。
+      </Step>
+      <Step title="选择提供商">
+        选择 `OpenAI Compatible` 作为 API 提供商。
+      </Step>
+      <Step title="填写提供商字段">
+        输入:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** 您 Volink 账户中已启用的模型 ID
+
+        如果您需要绕过 Kilo Code 的路径构造,请改用完整的聊天补全端点:
+
+        ```text
+        https://api.volink.org/v1/chat/completions
+        ```
+
+        如果您的 Kilo Code 版本同时公开两个字段,请勿同时使用完整端点 URL 和单独的路径字段。
+      </Step>
+      <Step title="配置模型元数据">
+        在 **Model Configuration** 中,设置 Kilo Code 使用的本地元数据:
+
+        - **Max Output Tokens**
+        - **Context Window**
+        - **Image Support** —— 仅对支持视觉的模型启用
+        - **Computer Use** —— 仅在需要时启用
+        - **Input Price / Output Price**
+      </Step>
+      <Step title="验证">
+        运行只读提示:
+
+        ```text
+        List the main files in this workspace and explain their purpose briefly.
+        ```
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **基础 URL 错误:** 很可能缺少 `/v1` 后缀。
+    - **无效模型错误:** 配置的模型不可用于您的 Volink 账户。
+    - **编辑失败:** 减少上下文大小或选择支持更强编码的模型。
+    - **不支持的参数:** 调整模型配置并禁用不支持的功能。
+  </Accordion>
+
+  <Accordion title="OpenClaw">
+    OpenClaw 通过使用 `openai-completions` API 样式的 OpenAI 兼容端点连接到 Volink。
+
+    **协议:** OpenAI 兼容
+
+    <Tabs>
+      <Tab title="Config JSON">
+        将提供商条目添加到您的 OpenClaw 配置中:
+
+        ```json
+        {
+          "models": {
+            "providers": {
+              "volink": {
+                "api": "openai-completions",
+                "baseURL": "https://api.volink.org/v1",
+                "envKey": "VOLINK_API_KEY",
+                "models": {
+                  "your_model_id": {
+                    "name": "your_model_id"
+                  }
+                }
+              }
+            }
+          },
+          "agents": {
+            "defaults": {
+              "model": {
+                "primary": "volink/your_model_id"
+              }
+            }
+          }
+        }
+        ```
+
+        然后在您的环境中设置 API 密钥:
+
+        ```bash
+        export VOLINK_API_KEY="your_volink_api_key"
+        ```
+      </Tab>
+      <Tab title="UI 设置">
+        如果 OpenClaw 在其 UI 中公开提供商设置而不是配置文件,请使用:
+
+        - **API format:** OpenAI-compatible
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** Volink 启用的聊天模型
+
+        默认的 `Authorization: Bearer` 标头足以用于 Volink。
+      </Tab>
+    </Tabs>
+
+    **验证**
+
+    启动一个新任务,要求 OpenClaw 在不修改文件的情况下回答:
+
+    ```text
+    Confirm the model is connected and describe the current task in one sentence.
+    ```
+
+    **故障排除**
+
+    - **身份验证失败:** 重新生成或重新复制 Volink API 密钥。
+    - **模型不可用:** 选择您的 Volink 控制面板中列出的模型。
+    - **请求超时:** 如果可用,减少上下文或增加客户端的 API 超时。
+    - **模型发现问题:** 手动添加模型,而不是依赖 `/v1/models`。
+  </Accordion>
+
+  <Accordion title="Hermes">
+    Hermes Agent 使用 `~/.hermes/config.yaml` 进行其主要模型配置。旧版 `.env` 变量 `OPENAI_BASE_URL` 和 `LLM_MODEL` 不再为主要模型读取。
+
+    **协议:** OpenAI 兼容
+
+    <Tabs>
+      <Tab title="设置向导">
+        运行模型设置向导:
+
+        ```bash
+        hermes model
+        ```
+
+        选择**自定义端点 (自托管 / VLLM / 等)**,然后输入:
+
+        - **API base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model name:** 您 Volink 账户中已启用的模型 ID
+
+        Hermes 将所选提供商、基础 URL 和模型保存到 `~/.hermes/config.yaml`。
+      </Tab>
+      <Tab title="手动配置">
+        直接编辑 `~/.hermes/config.yaml`:
+
+        ```yaml
+        model:
+          provider: custom
+          default: your_model_id
+          base_url: https://api.volink.org/v1
+          api_key: ${VOLINK_API_KEY}
+        ```
+
+        在您的 shell 或 `~/.hermes/.env` 中设置密钥:
+
+        ```bash
+        VOLINK_API_KEY="your_volink_api_key"
+        ```
+
+        <Note>保持 `~/.hermes/config.yaml` 私密。请勿将真实的 API 密钥提交到共享的 dotfiles 或仓库。</Note>
+      </Tab>
+    </Tabs>
+
+    **会话期间切换模型**
+
+    仅在自定义端点已配置后,在活动的 Hermes 聊天中使用 `/model`。例如:
+
+    ```text
+    /model custom:your_model_id
+    /model custom
+    ```
+
+    `/model custom`(不带模型 ID)要求 Hermes 查询 `/models`,并在仅有一个可用模型时自动选择该模型。
+
+    **辅助任务模型**
+
+    要通过 Volink 路由辅助任务(例如网页提取),请将其添加到 `config.yaml`:
+
+    ```yaml
+    auxiliary:
+      web_extract:
+        base_url: https://api.volink.org/v1
+        api_key: ${VOLINK_API_KEY}
+        model: your_model_id
+    ```
+
+    对于图像分析,请选择支持视觉输入的 Volink 模型。
+
+    **验证**
+
+    ```bash
+    hermes config
+    ```
+
+    然后启动 Hermes 并运行安全的只读提示:
+
+    ```text
+    Explain how this repository is organized. Do not edit files.
+    ```
+
+    **故障排除**
+
+    - `401`:API 密钥缺失或无效。
+    - `403`:API 密钥无法访问所选模型。
+    - `404`:模型 ID 或端点不正确。
+    - **更改未应用:** 运行 `hermes config` 并确认 `~/.hermes/config.yaml` 包含自定义提供商。
+    - **旧版环境变量:** 如果您之前在 `~/.hermes/.env` 中使用 `OPENAI_BASE_URL` 或 `LLM_MODEL`,请将这些值迁移到 `config.yaml`。
+    - **`/model` 无法添加端点:** 退出会话并运行 `hermes model`;`/model` 仅在已配置的提供商之间切换。
+  </Accordion>
+
+  <Accordion title="OpenAI Codex CLI">
+    OpenAI Codex CLI 通过环境变量或 `config.toml` 提供商块支持自定义 OpenAI 兼容端点。Codex 变化迅速 —— 请在您安装的版本中验证确切的配置名称。
+
+    **协议:** OpenAI 兼容
+
+    <Tabs>
+      <Tab title="环境变量">
+        在启动 Codex 之前设置 Volink 密钥和基础 URL:
+
+        ```bash
+        export OPENAI_API_KEY="your_volink_api_key"
+        export OPENAI_BASE_URL="https://api.volink.org/v1"
+        ```
+
+        然后使用您 Volink 账户中已启用的模型 ID 启动 Codex:
+
+        ```bash
+        codex --model "your_model_id"
+        ```
+      </Tab>
+      <Tab title="config.toml">
+        如果您的 Codex 版本在 `config.toml` 中支持自定义模型提供商:
+
+        ```toml
+        model_provider = "volink"
+        model = "your_model_id"
+
+        [model_providers.volink]
+        name = "Volink"
+        base_url = "https://api.volink.org/v1"
+        wire_api = "chat"
+        env_key = "OPENAI_API_KEY"
+        ```
+
+        使用 `wire_api = "chat"`,因为 Volink 为第三方客户端广泛兼容的路由是 Chat Completions,而不是 Responses API。
+      </Tab>
+    </Tabs>
+
+    **验证**
+
+    运行只读任务:
+
+    ```text
+    Inspect the current project and summarize it without changing files.
+    ```
+
+    **故障排除**
+
+    - **CLI 忽略 `OPENAI_BASE_URL`:** 检查您安装的版本是否支持自定义端点。
+    - **身份验证失败:** 确认 `OPENAI_API_KEY` 包含您的 Volink API 密钥。
+    - **模型失败:** 使用 Volink 中已启用的精确模型 ID。
+    - **使用 ChatGPT 登录并同时设置了 `OPENAI_API_KEY`:** 确认您的 Codex 版本优先使用哪条身份验证路径。
+    - **WebSocket 或 Responses API 路径失败:** 如果支持,使用 `wire_api = "chat"` 配置自定义提供商。
+  </Accordion>
+
+  <Accordion title="OpenCode">
+    OpenCode 通过 `opencode.json` 支持提供商自定义。使用 `/connect` 命令添加凭证,然后在 `provider` 部分下配置提供商的 `baseURL`。
+
+    **协议:** OpenAI 兼容
+
+    <Steps>
+      <Step title="添加凭证">
+        启动 OpenCode 并运行:
+
+        ```text
+        /connect
+        ```
+
+        选择或创建一个 OpenAI 兼容提供商配置文件,然后粘贴您的 Volink API 密钥。OpenCode 将凭证存储在 `~/.local/share/opencode/auth.json` 中。
+      </Step>
+      <Step title="配置提供商">
+        将自定义提供商添加到 `opencode.json`:
+
+        ```json
+        {
+          "$schema": "https://opencode.ai/config.json",
+          "provider": {
+            "volink": {
+              "npm": "@ai-sdk/openai-compatible",
+              "name": "Volink",
+              "options": {
+                "baseURL": "https://api.volink.org/v1"
+              },
+              "models": {
+                "your_model_id": {
+                  "name": "your_model_id"
+                }
+              }
+            }
+          }
+        }
+        ```
+
+        使用您 Volink 账户中已启用的精确模型 ID。如果您的模型支持工具调用,请为代理编码工作流程选择它。
+      </Step>
+      <Step title="验证">
+        要求 OpenCode:
+
+        ```text
+        Summarize this repository in three bullets. Do not edit files.
+        ```
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **端点错误:** 确认基础 URL 中存在 `/v1`。
+    - **未找到模型:** 模型 ID 区分大小写。
+    - **高级模式失败:** 某些 OpenCode 模式需要所选模型的工具调用或结构化输出支持。
+    - **未识别凭证:** 使用 `/connect` 重新连接提供商,并确认 `opencode.json` 中的提供商 ID 与模型选择匹配。
+  </Accordion>
+
+  <Accordion title="Cursor">
+    Cursor 支持标准聊天模型的外部提供商 API 密钥。在 Cursor 的模型设置中配置密钥和基础 URL。
+
+    **协议:** OpenAI 兼容
+
+    <Steps>
+      <Step title="打开 Cursor 设置">
+        打开 **Cursor Settings** 并转到 **Models**。
+      </Step>
+      <Step title="输入您的 API 密钥">
+        在 OpenAI API 密钥字段中输入您的 Volink API 密钥。
+      </Step>
+      <Step title="设置基础 URL">
+        如果您的 Cursor 版本公开了自定义或覆盖的 OpenAI 基础 URL 字段,请将其设置为:
+
+        ```text
+        https://api.volink.org/v1
+        ```
+      </Step>
+      <Step title="验证并选择模型">
+        单击 **Verify**。如果您的 Cursor 版本支持自定义模型条目,请添加或选择 Volink 模型 ID。
+      </Step>
+      <Step title="确认连接">
+        询问 Cursor Chat:
+
+        ```text
+        Reply with a short confirmation that Volink is connected.
+        ```
+      </Step>
+    </Steps>
+
+    **故障排除**
+
+    - **自定义端点受限:** Cursor 可能会限制某些内置功能的自定义端点。仅使用公开 OpenAI 兼容配置的功能。
+    - **身份验证错误:** API 密钥字段可能为空或包含多余的空格。
+    - **模型错误:** 所选模型未为您的 Volink 账户启用。
+    - **Tab 补全仍使用 Cursor 模型:** 即使配置了自定义 API 密钥,Tab 补全和其他 Cursor 专用功能也可能继续使用 Cursor 管理的模型。
+  </Accordion>
+
+  <Accordion title="Kiro">
+    当您的 Kiro 版本中提供自定义 OpenAI 兼容模型提供商时,Kiro 可连接到 Volink。
+
+    **协议:** OpenAI 兼容
+
+    <Steps>
+      <Step title="打开模型提供商设置">
+        在 Kiro 的模型提供商设置中,配置自定义 OpenAI 兼容提供商。
+      </Step>
+      <Step title="填写提供商字段">
+        输入:
+
+        - **Provider type:** OpenAI-compatible
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** 您的 Volink API 密钥
+        - **Model:** Volink 启用的模型 ID
+      </Step>
+      <Step title="配置模型角色(可选)">
+        如果 Kiro 支持多个模型角色,请为每个角色配置适合任务的模型。使用更强大的模型进行实现,使用较小的模型进行摘要或后台工作。
+      </Step>
+      <Step title="验证">
+        运行安全提示:
+
+        ```text
+        Read the current project context and explain what you can help with. Do not modify files.
+        ```
+      </Step>
+    </Steps>
+
+    <Note>Kiro 可用的提供商控制可能因发布版本和工作区策略而异。如果 Kiro 在您的环境中仅支持内置提供商,则该功能无法选择 Volink。</Note>
+
+    **故障排除**
+
+    - **没有自定义提供商设置:** Volink 无法用于该 Kiro 功能。
+    - `404`:检查 `/v1` 基础 URL 和模型 ID。
+    - **代理功能失败:** 选择支持工具调用的模型。
+    - **模型在聊天中显示但在代理模式中不显示:** 检查 Kiro 是否需要单独的代理模型设置。
+  </Accordion>
+
+</AccordionGroup>

@@ -1,0 +1,33 @@
+---
+title: "POST /v1/tts/speech —— Volink 原生 TTS 端点"
+description: "Volink 原生文本转语音端点,具有 Volink 特定的配额错误处理,并完全支持自定义声音 ID,包括克隆和混合。"
+---
+
+Volink 原生 TTS 端点在功能上类似于 OpenAI 兼容的 `/v1/audio/speech`,但具有针对配额错误的 Volink 特定行为。当您希望对配额不足的情况获得明确的 `402` 响应,而不是默认的上游错误行为时,请使用此端点。
+
+## 端点
+
+```http
+POST /v1/tts/speech
+```
+
+<Note>
+  与 `/v1/audio/speech` 不同,当您的账户没有足够的积分来完成请求时,此端点会返回 `402 Insufficient quota` 状态代码。这使得无需解析错误消息字符串,即可更容易以编程方式检测和处理配额耗尽。
+</Note>
+
+## 参数
+
+有关完整的参数参考 —— 包括 `model`、`input`、`voice`、`response_format`、`speed` 和 `instructions` —— 请参阅 [OpenAI 兼容语音端点](/api-reference/tts/openai-speech)。此端点接受相同的请求正文。
+
+<Note>
+  您可以将任何 Volink 声音 ID 与此端点一起使用,包括通过 Volink 语音功能创建的自定义声音:语音混合、文本设计语音和语音克隆。请从您的 Volink 账户中检索可用的声音 ID。
+</Note>
+
+## 身份验证
+
+使用标准 Bearer 身份验证:
+
+```http
+Authorization: Bearer YOUR_VOLINK_API_KEY
+Content-Type: application/json
+```

@@ -1,0 +1,148 @@
+---
+title: "Volink FAQ: Account, Billing, Models, and API Keys"
+description: "Common questions about Volink account setup, billing, supported models, API keys, voice features, and troubleshooting error codes."
+---
+
+Find answers to common questions about using Volink, including account setup, payments, voice features, and supported models. If you cannot find what you are looking for, reach out to support.
+
+## Account & login
+
+<AccordionGroup>
+  <Accordion title="How do I log in to Volink?">
+    Click **Log In** in the top-right corner, enter your **email address** and **verification code**, then click **Log In**.
+  </Accordion>
+
+  <Accordion title="How do I check my points consumption?">
+    Click **Points** under **Account** in the left sidebar, click **Usage**, then select a **start date** and **end date** to view your points consumption history.
+  </Accordion>
+
+  <Accordion title="How do I purchase points?">
+    Click **Top Up**, then select your desired **plan**.
+  </Accordion>
+
+  <Accordion title="What payment methods does Volink support?">
+    You can pay for plans using a **Credit Card** or **Alipay**.
+  </Accordion>
+</AccordionGroup>
+
+## Models & API
+
+<AccordionGroup>
+  <Accordion title="What platforms and providers does Volink support?">
+    Volink currently supports these mainstream platforms:
+
+    - Anthropic
+    - BytePlus
+    - DeepSeek
+    - Google
+    - MiniMax
+    - MoonshotAI
+    - OpenAI
+    - Qwen
+    - Z.AI
+    - X.AI
+  </Accordion>
+
+  <Accordion title="What models does Volink support?">
+    **Text models**
+
+    - Claude (Haiku / Opus / Sonnet)
+    - Doubao
+    - DeepSeek (R1 / V3)
+    - Gemini
+    - MiniMax
+    - Kimi
+    - GPT
+    - Qwen
+    - GLM4.6
+    - Grok
+
+    **Voice models**
+
+    - MiniMax: Speech 02 Turbo
+    - ByteDance: Open Speech TTS v3
+    - SenseTime: Daily Innovation TTS v1
+    - CosyVoice2-0.5B
+  </Accordion>
+
+  <Accordion title="How do I get API keys for text and voice?">
+    A single API key grants access to all Volink text and voice models.
+
+    1. Click **API Keys** in the left sidebar.
+    2. Click the blue **Create API Key** button.
+    3. Enter a **key name** in the pop-up, then click **Create** to generate your key.
+
+    <Warning>
+      Copy and save your API key immediately after creation — you will not be able to view it again.
+    </Warning>
+
+    You can create multiple API keys for different projects or environments.
+  </Accordion>
+</AccordionGroup>
+
+## Voice features
+
+<AccordionGroup>
+  <Accordion title="How do I create a Voice Mix?">
+    Voice mixing combines multiple voice characters to create a unique conversational effect.
+
+    1. Click **Create My Voice**.
+    2. Click **Voice Mix**.
+    3. Enter a **name** and select a **voice model**.
+    4. Click **Add Voice**.
+    5. Select a language and gender.
+    6. Enter **preview text**.
+    7. Click **Save**.
+
+    For higher customization, open **Settings** on the voice mix page to adjust precise parameters.
+  </Accordion>
+
+  <Accordion title="How do I create a Text-Designed Voice?">
+    Text-designed voice uses a text description to generate a custom voice.
+
+    1. Click **Create My Voice**.
+    2. Click **Text-Designed Voice**.
+    3. Enter a **name** and select a **voice model**.
+    4. Enter a **prompt describing the voice**.
+    5. Enter **preview text**.
+    6. Click **Save & Activate**.
+  </Accordion>
+
+  <Accordion title="How do I create a Voice Clone?">
+    Voice cloning replicates a tone from recorded audio samples to recreate a custom voice.
+
+    1. Click **Create My Voice**.
+    2. Click **Voice Clone**.
+    3. Enter a **name** and select a **voice model**.
+    4. Upload an **audio file**.
+    5. Select a language and gender.
+    6. Enter **preview text**.
+    7. Click **Save & Activate**.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="What does error code 401 mean?">
+    A `401` status code means your request is unauthorized. Verify that your API key is correct and included in the `Authorization` header as `Bearer YOUR_VOLINK_API_KEY`.
+  </Accordion>
+
+  <Accordion title="What does error code 404 mean?">
+    A `404` status code means the endpoint, model, or resource was not found. Check the endpoint path and model ID in your request.
+
+    For voice requests, confirm that the voice ID exists in your account.
+  </Accordion>
+
+  <Accordion title="What does error code 429 mean?">
+    A `429` status code means you have exceeded your current quota. Check your plan and billing details, or purchase more points via **Top Up** in your account.
+  </Accordion>
+
+  <Accordion title="What does the temperature out of range error mean?">
+    This error occurs when the `temperature` value is outside the accepted range. Set `temperature` to a value between **0** and **1**.
+
+    <Note>
+      Different models may have different temperature ranges. Refer to the model's documentation for the exact supported range.
+    </Note>
+  </Accordion>
+</AccordionGroup>

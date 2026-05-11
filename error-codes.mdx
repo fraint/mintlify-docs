@@ -1,0 +1,55 @@
+---
+title: "Volink API Error Codes: What They Mean and How to Fix"
+description: "Every HTTP status code Volink returns, what each one means, how to fix it, and the standard error response format your client will receive."
+---
+
+Volink returns standard HTTP status codes for every API response. When a request fails, the response body contains a structured error object that describes what went wrong. Use this page to identify the cause of an error and resolve it.
+
+## HTTP status codes
+
+| Status | Meaning | How to resolve |
+| --- | --- | --- |
+| `400` | Invalid request | Check the request body format and verify all required fields are present and correctly typed |
+| `401` | Missing or invalid API key | Verify your API key is correct and included in the `Authorization` header as `Bearer YOUR_VOLINK_API_KEY` |
+| `402` | Insufficient quota | Purchase more points via **Top Up** in your account |
+| `403` | Access denied | Your API key does not have access to this model or feature |
+| `404` | Not found | Check the endpoint path and model ID |
+| `429` | Rate limit exceeded | Slow down your request rate or upgrade your plan |
+| `500` | Internal server error | Retry the request; contact support if the error persists |
+| `502` / `503` | Upstream provider error | Switch to a different model or retry later |
+
+## Error response format
+
+Every error response from Volink follows this JSON shape:
+
+```json
+{
+  "error": {
+    "message": "Invalid model.",
+    "type": "invalid_request_error",
+    "code": "model_not_found"
+  }
+}
+```
+
+- `message` — A human-readable description of the error.
+- `type` — The category of the error (for example, `invalid_request_error`).
+- `code` — A machine-readable code identifying the specific error.
+
+## Common issues
+
+**Temperature out of range**
+
+If you receive an error about `temperature`, the value you provided is outside the accepted range. Set `temperature` to a number between **0** and **1**. Note that different models may support different temperature ranges; check the model's documentation for the exact limits.
+
+**Voice ID not found (404)**
+
+If a voice request returns a `404`, the voice ID specified in your request does not exist in your account. Open the **Voice** section of the Volink dashboard and confirm that the voice ID is correct and has been created.
+
+**Text too long (413)**
+
+If the input text is too long to synthesize, reduce the length of your input text or lower the `max_tokens` limit in your request.
+
+<Tip>
+  If you receive a `503`, the upstream provider may be overloaded. Try switching to another model while the provider recovers.
+</Tip>

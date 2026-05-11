@@ -1,0 +1,190 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Volink",
+  "theme": "luma",
+  "colors": {
+    "primary": "#2c54f4",
+    "light": "#2c9494"
+  },
+  "favicon": "https://media.brand.dev/d3618548-8e87-4a0f-a1b8-e112d325c74e.svg",
+  "logo": {
+    "light": "https://media.brand.dev/526dc308-61ba-48ba-a56b-a8570d6ddb6f.svg",
+    "dark": "https://media.brand.dev/526dc308-61ba-48ba-a56b-a8570d6ddb6f.svg"
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/volink"
+    }
+  },
+  "navigation": {
+    "languages": [
+      {
+        "language": "en",
+        "tabs": [
+          {
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "introduction",
+                  "quickstart",
+                  "authentication"
+                ]
+              },
+              {
+                "group": "Account",
+                "pages": [
+                  "account/api-keys",
+                  "account/points-billing",
+                  "account/models"
+                ]
+              },
+              {
+                "group": "Voice Features",
+                "pages": [
+                  "voice/voice-mix",
+                  "voice/text-designed-voice",
+                  "voice/voice-clone"
+                ]
+              },
+              {
+                "group": "Integrations",
+                "pages": [
+                  "integrations/ai-agents",
+                  "integrations/chat-platforms",
+                  "integrations/ai-role-play"
+                ]
+              },
+              {
+                "group": "Help",
+                "pages": [
+                  "faq",
+                  "error-codes"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "api-reference/overview",
+                  "api-reference/authentication",
+                  "api-reference/errors"
+                ]
+              },
+              {
+                "group": "Chat",
+                "pages": [
+                  "api-reference/chat/openai-completions",
+                  "api-reference/chat/anthropic-messages"
+                ]
+              },
+              {
+                "group": "Text-to-Speech",
+                "pages": [
+                  "api-reference/tts/openai-speech",
+                  "api-reference/tts/volink-tts"
+                ]
+              },
+              {
+                "group": "Image Generation",
+                "pages": [
+                  "api-reference/images/openai-images",
+                  "api-reference/images/volink-images"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "language": "cn",
+        "tabs": [
+          {
+            "tab": "文档",
+            "groups": [
+              {
+                "group": "入门",
+                "pages": [
+                  "cn/introduction",
+                  "cn/quickstart",
+                  "cn/authentication"
+                ]
+              },
+              {
+                "group": "账户",
+                "pages": [
+                  "cn/account/api-keys",
+                  "cn/account/points-billing",
+                  "cn/account/models"
+                ]
+              },
+              {
+                "group": "语音功能",
+                "pages": [
+                  "cn/voice/voice-mix",
+                  "cn/voice/text-designed-voice",
+                  "cn/voice/voice-clone"
+                ]
+              },
+              {
+                "group": "集成",
+                "pages": [
+                  "cn/integrations/ai-agents",
+                  "cn/integrations/chat-platforms",
+                  "cn/integrations/ai-role-play"
+                ]
+              },
+              {
+                "group": "帮助",
+                "pages": [
+                  "cn/faq",
+                  "cn/error-codes"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API 参考",
+            "groups": [
+              {
+                "group": "概览",
+                "pages": [
+                  "cn/api-reference/overview",
+                  "cn/api-reference/authentication",
+                  "cn/api-reference/errors"
+                ]
+              },
+              {
+                "group": "聊天",
+                "pages": [
+                  "cn/api-reference/chat/openai-completions",
+                  "cn/api-reference/chat/anthropic-messages"
+                ]
+              },
+              {
+                "group": "文本转语音",
+                "pages": [
+                  "cn/api-reference/tts/openai-speech",
+                  "cn/api-reference/tts/volink-tts"
+                ]
+              },
+              {
+                "group": "图像生成",
+                "pages": [
+                  "cn/api-reference/images/openai-images",
+                  "cn/api-reference/images/volink-images"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

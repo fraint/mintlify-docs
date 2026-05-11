@@ -1,0 +1,61 @@
+---
+title: "POST /v1/audio/speech — OpenAI Text-to-Speech"
+description: "Convert text to audio using Volink's OpenAI-compatible speech endpoint, with support for multiple voices, formats, speeds, and style instructions."
+---
+
+The `/v1/audio/speech` endpoint follows the OpenAI speech synthesis protocol. Pass a model ID, a voice, and the text you want synthesized, and the endpoint returns binary audio data that you can save to a file or stream directly to your application.
+
+## Endpoint
+
+```http
+POST /v1/audio/speech
+```
+
+## Request parameters
+
+<ParamField body="model" type="string" required>
+  TTS model ID, such as `gpt-4o-mini-tts`, `tts-1`, or `tts-1-hd`.
+</ParamField>
+
+<ParamField body="input" type="string" required>
+  The text to synthesize.
+</ParamField>
+
+<ParamField body="voice" type="string" required>
+  Voice ID. See your Volink account for available voice IDs, including Volink custom voices.
+</ParamField>
+
+<ParamField body="response_format" type="string">
+  Audio format for the returned file. Supported values include `mp3`, `opus`, `aac`, `flac`, `wav`, and `pcm`, depending on model support.
+</ParamField>
+
+<ParamField body="speed" type="number">
+  Playback speed multiplier. Usually ranges from `0.25` to `4.0` when supported by the model.
+</ParamField>
+
+<ParamField body="instructions" type="string">
+  Voice style instructions for models that support controllable speech, such as `gpt-4o-mini-tts`. Describe the desired tone, pace, or affect in plain text.
+</ParamField>
+
+## Example
+
+```bash
+curl "$VOLINK_BASE_URL/v1/audio/speech" \
+  -H "Authorization: Bearer $VOLINK_API_KEY" \
+  -H "Content-Type: application/json" \
+  --output speech.mp3 \
+  -d '{
+    "model": "gpt-4o-mini-tts",
+    "voice": "marin",
+    "input": "Welcome to Volink.",
+    "instructions": "Speak in a warm, clear, professional tone."
+  }'
+```
+
+<Note>
+  The response body is binary audio data, not JSON. Use `--output` in curl (or the equivalent in your HTTP client) to write the response directly to a file. Attempting to print the binary stream to your terminal will produce garbled output.
+</Note>
+
+## Response
+
+The response body is binary audio. Save it directly to a file or pipe it to your application for playback. The `Content-Type` header reflects the requested format (for example, `audio/mpeg` for MP3).

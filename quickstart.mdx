@@ -1,0 +1,90 @@
+---
+title: "Volink Quick Start: Send Your First API Request"
+description: "Create an account, generate an API key, set your environment variables, and send your first chat completion request to Volink's unified AI gateway."
+---
+
+Volink gives you a single API key and base URL that works across OpenAI-compatible, Anthropic-compatible, and Volink-native endpoints. Follow these steps to go from zero to your first successful API call.
+
+<Steps>
+  <Step title="Create or log in to your account">
+    Go to [volink.org](https://volink.org) and click **Log In** in the top-right corner. Enter your **email address**, then enter the **verification code** sent to that address, and click **Log In**.
+  </Step>
+
+  <Step title="Create an API key">
+    1. In the left sidebar, click **API Keys**.
+    2. Click the blue **Create API Key** button.
+    3. Enter a name for the key in the pop-up dialog and click **Create**.
+    4. Copy the key immediately and store it somewhere secure.
+
+    <Note>
+      You can only view your API key once, immediately after creation. Volink does not display the full key again after you close the dialog. If you lose it, create a new one.
+    </Note>
+  </Step>
+
+  <Step title="Set your environment variables">
+    Set your API key and the Volink base URL as environment variables in your shell. All API calls in this guide use these variables.
+
+    ```bash
+    export VOLINK_API_KEY="your_api_key"
+    export VOLINK_BASE_URL="https://api.volink.org"
+    ```
+  </Step>
+
+  <Step title="Make your first API call">
+    Send a chat completion request using the OpenAI-compatible endpoint. This example uses `gpt-4.1` and asks the model to introduce itself.
+
+    ```bash
+    curl "$VOLINK_BASE_URL/v1/chat/completions" \
+      -H "Authorization: Bearer $VOLINK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "model": "gpt-4.1",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a helpful assistant."
+          },
+          {
+            "role": "user",
+            "content": "Explain Volink in one sentence."
+          }
+        ],
+        "temperature": 0.7
+      }'
+    ```
+  </Step>
+
+  <Step title="Verify the response">
+    A successful response looks like this:
+
+    ```json
+    {
+      "id": "chatcmpl_xxx",
+      "object": "chat.completion",
+      "created": 1710000000,
+      "model": "openai/gpt-4.1",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Volink lets developers access multiple AI models through unified APIs."
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 20,
+        "completion_tokens": 12,
+        "total_tokens": 32
+      }
+    }
+    ```
+
+    If you receive a `401` error, check that your `VOLINK_API_KEY` variable is set correctly. If you receive a `404`, confirm that `VOLINK_BASE_URL` is set to `https://api.volink.org`.
+  </Step>
+</Steps>
+
+<Tip>
+  See the [API Reference](/api-reference/overview) for all available endpoints, including Anthropic-compatible chat, text-to-speech, and image generation.
+</Tip>

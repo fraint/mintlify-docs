@@ -1,0 +1,109 @@
+---
+title: "POST /v1/images/generations —— 图像生成"
+description: "使用 Volink 的 OpenAI 兼容图像端点从文本提示生成图像,可控制尺寸、质量、格式、背景和审核。"
+---
+
+`/v1/images/generations` 端点遵循 OpenAI Images API 协议。传递模型 ID 和文本提示,端点将返回一个或多个生成的图像,具体形式取决于模型和提供商,为 base64 编码的数据或 URL。
+
+## 端点
+
+```http
+POST /v1/images/generations
+```
+
+## 请求参数
+
+<ParamField body="model" type="string" required>
+  图像模型 ID,例如 `gpt-image-2`、`gpt-image-1.5`、`gpt-image-1` 或 `gpt-image-1-mini`。
+</ParamField>
+
+<ParamField body="prompt" type="string" required>
+  描述您要生成的图像的文本提示。
+</ParamField>
+
+<ParamField body="n" type="integer">
+  要生成的图像数量。未指定时默认为 `1`。
+</ParamField>
+
+<ParamField body="size" type="string">
+  输出尺寸,例如 `1024x1024`。支持的值取决于模型 —— 请查看您的模型文档以了解有效尺寸。
+</ParamField>
+
+<ParamField body="quality" type="string">
+  输出质量级别,例如 `low`、`medium` 或 `high`。可用性取决于模型支持。
+</ParamField>
+
+<ParamField body="background" type="string">
+  模型支持时的背景模式,例如 `transparent`。
+</ParamField>
+
+<ParamField body="moderation" type="string">
+  对于支持的 GPT Image 模型的审核严格度设置。
+</ParamField>
+
+<ParamField body="output_format" type="string">
+  支持时的输出图像格式,例如 `png`、`jpeg` 或 `webp`。
+</ParamField>
+
+<Note>
+  `size` 和 `quality` 的支持值因模型而异。传递不受支持的组合可能会导致 `400` 错误或参数被忽略。请查阅您的 Volink 账户的模型列表以了解每个模型的功能。
+</Note>
+
+## 示例
+
+```bash
+curl "$VOLINK_BASE_URL/v1/images/generations" \
+  -H "Authorization: Bearer $VOLINK_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "openai/gpt-image-2",
+    "prompt": "A clean hero illustration for an AI API platform called Volink.",
+    "size": "1024x1024",
+    "quality": "medium"
+  }'
+```
+
+## 响应
+
+大多数模型将图像作为 base64 编码的数据返回:
+
+```json
+{
+  "created": 1710000000,
+  "data": [
+    {
+      "b64_json": "base64_encoded_image_data"
+    }
+  ]
+}
+```
+
+某些兼容的模型或提供商可能改为返回 URL:
+
+```json
+{
+  "created": 1710000000,
+  "data": [
+    {
+      "url": "https://example.com/generated-image.png"
+    }
+  ]
+}
+```
+
+<ResponseField name="created" type="integer">
+  图像生成时的 Unix 时间戳。
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  生成的图像对象数组。每个项目都包含带有 base64 编码图像数据的 `b64_json` 字段,或带有图像链接的 `url` 字段。
+
+  <Expandable title="properties">
+    <ResponseField name="data[].b64_json" type="string">
+      Base64 编码的图像数据。解码此字符串以获取原始图像字节。
+    </ResponseField>
+    <ResponseField name="data[].url" type="string">
+      指向生成图像的 URL。可用性取决于模型和提供商。
+    </ResponseField>
+  </Expandable>
+</ResponseField>

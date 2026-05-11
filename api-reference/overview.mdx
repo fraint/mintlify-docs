@@ -1,0 +1,45 @@
+---
+title: "Volink REST API Reference: Chat, TTS, and Images"
+description: "Explore Volink's OpenAI-compatible and Anthropic-compatible REST APIs for chat, text-to-speech, and image generation — all under one API key."
+---
+
+Volink provides OpenAI-compatible and Anthropic-compatible REST APIs for chat completions, text-to-speech, and image generation. You use the same Volink API key across every protocol, and all requests go to the same base URL: `https://api.volink.org`.
+
+## Set up your environment
+
+Export your credentials before running any examples in this reference:
+
+```bash
+export VOLINK_API_KEY="your_api_key"
+export VOLINK_BASE_URL="https://api.volink.org"
+```
+
+## Available endpoints
+
+| Endpoint | Protocol | Description |
+| --- | --- | --- |
+| `POST /v1/chat/completions` | OpenAI-compatible | Chat completions |
+| `POST /v1/messages` | Anthropic-compatible | Chat messages |
+| `POST /v1/audio/speech` | OpenAI-compatible | Text-to-speech |
+| `POST /v1/tts/speech` | Volink-native | Text-to-speech |
+| `POST /v1/images/generations` | OpenAI-compatible | Image generation |
+| `GET /v1/models` | OpenAI-compatible | List available models |
+
+For details on how to authenticate your requests, see [Authentication](/api-reference/authentication). For a full list of error codes and response formats, see [Errors](/api-reference/errors).
+
+## Explore by section
+
+<CardGroup cols={2}>
+  <Card title="Chat" icon="message" href="/api-reference/chat/openai-completions">
+    OpenAI-compatible chat completions and Anthropic Messages protocol for Claude-style payloads.
+  </Card>
+  <Card title="Text-to-Speech" icon="volume-high" href="/api-reference/tts/openai-speech">
+    OpenAI-compatible speech synthesis and the Volink-native TTS endpoint.
+  </Card>
+  <Card title="Image Generation" icon="image" href="/api-reference/images/openai-images">
+    OpenAI Images API and Volink's chat-based image generation via modalities.
+  </Card>
+  <Card title="Errors" icon="triangle-alert" href="/api-reference/errors">
+    HTTP status codes, error response format, and troubleshooting guidance.
+  </Card>
+</CardGroup>

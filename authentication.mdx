@@ -1,0 +1,76 @@
+---
+title: "How to Authenticate Your Requests to the Volink API"
+description: "Pass your Volink API key as a Bearer token for OpenAI-compatible endpoints, or use the x-api-key header for the Anthropic Messages protocol."
+---
+
+Every request to the Volink API must include your API key. The header format depends on which API protocol you are using. For most endpoints, you pass the key as a Bearer token. The Anthropic Messages protocol uses a different header convention.
+
+<Warning>
+  Never expose your API key in client-side code, browser scripts, or public repositories. Treat it like a password. If a key is compromised, delete it in **Settings → API Keys** and create a new one.
+</Warning>
+
+## Standard authentication (OpenAI protocol)
+
+All OpenAI-compatible endpoints — including chat completions, text-to-speech, and image generation — use the `Authorization: Bearer` header.
+
+```http
+Authorization: Bearer YOUR_VOLINK_API_KEY
+Content-Type: application/json
+```
+
+## Protocol-specific headers
+
+<Tabs>
+  <Tab title="OpenAI protocol">
+    Use these headers when calling `/v1/chat/completions`, `/v1/audio/speech`, `/v1/images/generations`, and all other OpenAI-compatible endpoints.
+
+    ```http
+    Authorization: Bearer YOUR_VOLINK_API_KEY
+    Content-Type: application/json
+    ```
+
+    **Example request:**
+
+    ```bash
+    curl "https://api.volink.org/v1/chat/completions" \
+      -H "Authorization: Bearer $VOLINK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "model": "gpt-4.1",
+        "messages": [{"role": "user", "content": "Hello"}]
+      }'
+    ```
+  </Tab>
+
+  <Tab title="Anthropic protocol">
+    Use these headers when calling the Anthropic Messages endpoint (`/v1/messages`). This protocol requires `x-api-key` and `anthropic-version` headers instead of `Authorization`.
+
+    ```http
+    x-api-key: YOUR_VOLINK_API_KEY
+    anthropic-version: 2023-06-01
+    content-type: application/json
+    ```
+
+    **Example request:**
+
+    ```bash
+    curl "https://api.volink.org/v1/messages" \
+      -H "x-api-key: $VOLINK_API_KEY" \
+      -H "anthropic-version: 2023-06-01" \
+      -H "content-type: application/json" \
+      -d '{
+        "model": "claude-sonnet-4.5",
+        "max_tokens": 512,
+        "messages": [{"role": "user", "content": "Hello"}]
+      }'
+    ```
+
+    <Note>
+      If your HTTP client or SDK uses Bearer authentication and cannot set custom headers, Volink also accepts `Authorization: Bearer YOUR_VOLINK_API_KEY` for the Anthropic protocol. Use one authentication style consistently within a single request.
+    </Note>
+  </Tab>
+</Tabs>
+
+## Getting an API key
+
+To create an API key, go to **API Keys** in the left sidebar of your Volink account and click **Create API Key**. See [API Keys](/account/api-keys) for step-by-step instructions.

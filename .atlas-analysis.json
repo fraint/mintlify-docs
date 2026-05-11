@@ -1,0 +1,113 @@
+{
+  "projectType": "api-service",
+  "projectName": "Volink",
+  "projectDescription": "Volink provides unified OpenAI-compatible and provider-native APIs for chat, text-to-speech, and image generation, accessible with a single API key.",
+  "theme": "luma",
+  "primaryColor": "#2c54f4",
+  "lightColor": "#2c9494",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Account",
+            "pages": [
+              "account/api-keys",
+              "account/points-billing",
+              "account/models"
+            ]
+          },
+          {
+            "group": "Voice Features",
+            "pages": [
+              "voice/voice-mix",
+              "voice/text-designed-voice",
+              "voice/voice-clone"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/ai-agents",
+              "integrations/chat-platforms",
+              "integrations/ai-role-play"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "faq",
+              "error-codes"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/overview",
+              "api-reference/authentication",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "Chat",
+            "pages": [
+              "api-reference/chat/openai-completions",
+              "api-reference/chat/anthropic-messages"
+            ]
+          },
+          {
+            "group": "Text-to-Speech",
+            "pages": [
+              "api-reference/tts/openai-speech",
+              "api-reference/tts/volink-tts"
+            ]
+          },
+          {
+            "group": "Image Generation",
+            "pages": [
+              "api-reference/images/openai-images",
+              "api-reference/images/volink-images"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "OpenAI-compatible chat completions API",
+    "Anthropic Messages API compatibility",
+    "Text-to-speech with multiple voice providers",
+    "Image generation via OpenAI and Volink protocols",
+    "Streaming support via server-sent events",
+    "Tool/function calling support",
+    "Custom voice creation (mix, text-designed, clone)",
+    "Single API key for all providers and models",
+    "Integrations with AI agents, chat platforms, and role-play apps",
+    "Points-based billing with usage tracking"
+  ],
+  "publicApiSurface": [
+    "POST /v1/chat/completions",
+    "POST /v1/messages",
+    "POST /v1/audio/speech",
+    "POST /v1/tts/speech",
+    "POST /v1/images/generations",
+    "GET /v1/models",
+    "Authorization: Bearer <API_KEY>",
+    "x-api-key header (Anthropic protocol)"
+  ]
+}

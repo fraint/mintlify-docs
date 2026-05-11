@@ -1,0 +1,61 @@
+---
+title: "POST /v1/audio/speech —— OpenAI 文本转语音"
+description: "使用 Volink 的 OpenAI 兼容语音端点将文本转换为音频,支持多种声音、格式、速度和样式指令。"
+---
+
+`/v1/audio/speech` 端点遵循 OpenAI 语音合成协议。传递模型 ID、声音和要合成的文本,端点将返回二进制音频数据,您可以将其保存到文件或直接流式传输到您的应用程序。
+
+## 端点
+
+```http
+POST /v1/audio/speech
+```
+
+## 请求参数
+
+<ParamField body="model" type="string" required>
+  TTS 模型 ID,例如 `gpt-4o-mini-tts`、`tts-1` 或 `tts-1-hd`。
+</ParamField>
+
+<ParamField body="input" type="string" required>
+  要合成的文本。
+</ParamField>
+
+<ParamField body="voice" type="string" required>
+  声音 ID。请查看您的 Volink 账户以获取可用的声音 ID,包括 Volink 自定义声音。
+</ParamField>
+
+<ParamField body="response_format" type="string">
+  返回文件的音频格式。支持的值包括 `mp3`、`opus`、`aac`、`flac`、`wav` 和 `pcm`,具体取决于模型支持。
+</ParamField>
+
+<ParamField body="speed" type="number">
+  播放速度乘数。当模型支持时,通常范围为 `0.25` 到 `4.0`。
+</ParamField>
+
+<ParamField body="instructions" type="string">
+  支持可控语音的模型(如 `gpt-4o-mini-tts`)的语音样式指令。用纯文本描述所需的音调、节奏或情感。
+</ParamField>
+
+## 示例
+
+```bash
+curl "$VOLINK_BASE_URL/v1/audio/speech" \
+  -H "Authorization: Bearer $VOLINK_API_KEY" \
+  -H "Content-Type: application/json" \
+  --output speech.mp3 \
+  -d '{
+    "model": "gpt-4o-mini-tts",
+    "voice": "marin",
+    "input": "Welcome to Volink.",
+    "instructions": "Speak in a warm, clear, professional tone."
+  }'
+```
+
+<Note>
+  响应正文是二进制音频数据,不是 JSON。使用 curl 中的 `--output`(或您 HTTP 客户端中的等效项)将响应直接写入文件。尝试将二进制流打印到终端将产生乱码输出。
+</Note>
+
+## 响应
+
+响应正文是二进制音频。直接将其保存到文件或通过管道传输到您的应用程序进行播放。`Content-Type` 标头反映所请求的格式(例如,MP3 为 `audio/mpeg`)。

@@ -1,0 +1,424 @@
+---
+title: "Integrate Volink with Open-Source Chat Platforms"
+description: "Use Volink with open-source and desktop chat clients. Configure any OpenAI-compatible chat app to route requests through your Volink API key."
+---
+
+Volink works with popular open-source and desktop chat clients through its OpenAI-compatible API. Point any supported chat platform at `https://api.volink.org/v1`, supply your Volink API key, and pick a model — all without managing separate provider accounts for each app.
+
+<AccordionGroup>
+
+  <Accordion title="Chatbox">
+    Chatbox supports custom model providers with a dedicated configuration flow. Add Volink as a provider, set the API type, fill in the key and host, and verify the connection.
+
+    <Steps>
+      <Step title="Open model provider settings">
+        Open Chatbox, click the settings button in the sidebar, then open **Model Provider**.
+      </Step>
+      <Step title="Add a provider">
+        Click **Add** if Volink is not already listed. Enter a provider name such as `Volink` and select `OpenAI API compatible`.
+      </Step>
+      <Step title="Fill in provider fields">
+        Enter:
+
+        - **API mode:** OpenAI-compatible
+        - **API Host:** `https://api.volink.org`
+        - **API Path:** leave empty to use the default `/v1/chat/completions`, or enter `/v1/chat/completions` if your version requires an explicit path
+        - **API key:** your Volink API key
+        - **Model:** add at least one Volink model ID
+
+        If Chatbox asks for a single complete endpoint URL, use:
+
+        ```text
+        https://api.volink.org/v1
+        ```
+
+        If it asks for the full chat-completions URL, use:
+
+        ```text
+        https://api.volink.org/v1/chat/completions
+        ```
+      </Step>
+      <Step title="Check and use the provider">
+        Click **Check** to verify the connection. Return to the home page, create a new conversation, and select the Volink model.
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Duplicated request path:** remove either the `/v1` suffix or the separate API path field — do not include both.
+    - **Authentication fails:** check the API key.
+    - **Model fails:** use the exact model ID from Volink.
+    - **Model missing image or tool features:** edit that model's capability configuration in Chatbox.
+  </Accordion>
+
+  <Accordion title="Cherry Studio">
+    Cherry Studio supports OpenAI-compatible providers with an API address override. The fields labeled `Secret`, `Key`, `API Key`, and `Token` all refer to the same credential.
+
+    <Steps>
+      <Step title="Open provider settings">
+        Open Cherry Studio provider settings and add or edit an OpenAI-compatible provider.
+      </Step>
+      <Step title="Fill in provider fields">
+        Enter:
+
+        - **API key:** your Volink API key
+        - **API address:** `https://api.volink.org/v1`
+        - **Model:** a Volink-enabled model ID
+      </Step>
+      <Step title="Add models">
+        After saving the provider, add or refresh the model list. If automatic model discovery is unavailable, add the model ID manually and enable the provider toggle.
+      </Step>
+      <Step title="Verify">
+        Open a new conversation and send:
+
+        ```text
+        Say hello from Volink in one sentence.
+        ```
+      </Step>
+    </Steps>
+
+    <Note>Cherry Studio supports multiple keys in one provider field, separated by commas, for key polling. For a standard setup, use a single Volink API key.</Note>
+
+    **Troubleshooting**
+
+    - **API address format:** use `https://api.volink.org/v1`. If Cherry Studio asks for only a root address and appends paths itself, use `https://api.volink.org`.
+    - **Model discovery fails:** add the model ID manually.
+    - **Feature errors:** confirm the selected model supports the capabilities enabled in Cherry Studio, such as vision or tools.
+  </Accordion>
+
+  <Accordion title="Kelivo">
+    Kelivo connects to Volink through its OpenAI-compatible custom endpoint settings, with optional controls for headers, timeouts, retries, and proxies.
+
+    <Steps>
+      <Step title="Open provider settings">
+        Open Kelivo settings, then open provider or custom request settings.
+      </Step>
+      <Step title="Configure the provider">
+        Enter:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model:** the Volink model ID you want to use
+      </Step>
+      <Step title="Set path prefixes (if applicable)">
+        If Kelivo separates path prefixes from the base URL, use:
+
+        - **Chat completions path:** `/chat/completions`
+        - **Models path:** `/models`
+
+        Do not enter `/v1/chat/completions` as the path when the base URL already ends with `/v1`.
+      </Step>
+      <Step title="Verify">
+        Send:
+
+        ```text
+        Confirm the Volink connection with a short response.
+        ```
+      </Step>
+    </Steps>
+
+    **Optional request settings**
+
+    Kelivo supports custom headers, timeouts, retry counts, and proxy settings. Start with the default bearer authentication. Add custom headers only when your Volink workspace or network gateway requires them. If your network is unstable, increase timeout and retry values before adjusting model settings.
+
+    **Troubleshooting**
+
+    - **Authentication error:** the API key is invalid or missing.
+    - **Model error:** the model ID is not enabled for your account.
+    - **Feature error:** the selected model does not support the requested capability.
+    - **Path error:** `/v1` or `/chat/completions` has been duplicated — use one or the other.
+  </Accordion>
+
+  <Accordion title="RikkaHub Android">
+    RikkaHub Android adds an OpenAI-compatible provider through its settings panel. The base URL must end with `/v1` because RikkaHub appends paths such as `/chat/completions` itself.
+
+    <Steps>
+      <Step title="Open providers">
+        Launch RikkaHub, open the sidebar from the top-left button, tap **Settings**, then tap **Providers**.
+      </Step>
+      <Step title="Add a provider">
+        Tap the plus button in the upper-right corner to add a new provider.
+      </Step>
+      <Step title="Configure the provider">
+        Enter:
+
+        - **Provider type:** OpenAI-compatible
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Model:** a Volink-enabled chat model ID
+
+        <Warning>Do not enter the full `/chat/completions` endpoint. RikkaHub appends that path to the base URL automatically.</Warning>
+      </Step>
+      <Step title="Add model IDs">
+        Tap the model box icon and add one or more Volink model IDs.
+      </Step>
+      <Step title="Start a chat">
+        Return to the homepage and start a chat. Send:
+
+        ```text
+        Reply with a short confirmation that Volink is connected.
+        ```
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Accidental spaces:** on mobile keyboards, check for leading or trailing spaces in API keys.
+    - **Cannot reach server:** confirm network access and the exact base URL.
+    - **Image or voice features fail:** choose a model that supports those capabilities.
+    - **Duplicated paths:** change the URL back to `https://api.volink.org/v1`.
+  </Accordion>
+
+  <Accordion title="OpenWebUI">
+    OpenWebUI connects to Volink as an OpenAI-compatible backend. It expects OpenAI Chat Completions-compatible endpoints (`/v1/models` and `/v1/chat/completions`).
+
+    <Tabs>
+      <Tab title="Admin UI">
+        <Steps>
+          <Step title="Open connections">
+            Open OpenWebUI in your browser, go to **Admin Settings** → **Connections** → **OpenAI**, then click **Add Connection**.
+          </Step>
+          <Step title="Fill in connection details">
+            Enter:
+
+            - **URL:** `https://api.volink.org/v1`
+            - **API Key:** your Volink API key
+            - **Model IDs:** leave empty to use model discovery, or add specific Volink model IDs to limit the allowlist
+          </Step>
+          <Step title="Save and select a model">
+            Save the connection, then select the Volink model from the chat model menu.
+          </Step>
+        </Steps>
+      </Tab>
+      <Tab title="Self-hosted (env vars)">
+        For self-hosted deployments, set:
+
+        ```bash
+        OPENAI_API_BASE_URL="https://api.volink.org/v1"
+        OPENAI_API_KEY="your_volink_api_key"
+        ```
+
+        If you use multiple OpenAI-compatible backends, OpenWebUI also supports semicolon-separated `OPENAI_API_BASE_URLS`.
+
+        Restart OpenWebUI after changing environment variables.
+      </Tab>
+    </Tabs>
+
+    **Verify**
+
+    Select the Volink model in the chat UI and send:
+
+    ```text
+    Give a one-sentence confirmation that this chat is using Volink.
+    ```
+
+    **Troubleshooting**
+
+    - **Environment variables not applied:** restart OpenWebUI after any environment change.
+    - **Model list empty:** refresh or manually add models if discovery is disabled.
+    - **Upstream errors:** check server logs for the status code returned by Volink.
+    - **RAG embeddings failing:** chat models and embedding models are separate settings — configure both.
+  </Accordion>
+
+  <Accordion title="LobeChat">
+    LobeChat can use Volink through its OpenAI provider settings in the app, or through environment variables for self-hosted deployments.
+
+    <Tabs>
+      <Tab title="In-app setup">
+        <Steps>
+          <Step title="Open language model settings">
+            In LobeChat, navigate to language model settings and choose **OpenAI** as the provider.
+          </Step>
+          <Step title="Enter Volink credentials">
+            Set:
+
+            - **API key:** your Volink API key
+            - **API proxy address / API host:** `https://api.volink.org/v1`
+            - **Custom model:** a Volink-enabled model ID
+          </Step>
+          <Step title="Fetch or add models">
+            If the UI has a model-list fetch action, run it after saving the proxy address. Otherwise add Volink model IDs manually.
+          </Step>
+        </Steps>
+      </Tab>
+      <Tab title="Self-hosted (env vars)">
+        For Docker or other self-hosted deployments, set:
+
+        ```bash
+        OPENAI_API_KEY="your_volink_api_key"
+        OPENAI_PROXY_URL="https://api.volink.org/v1"
+        ```
+
+        Restart LobeChat after changing environment variables.
+
+        <Note>Check whether your LobeChat version expects the proxy URL with or without `/v1`. Start with `/v1`; if requests are duplicated or empty, try the host-only value and inspect server logs.</Note>
+      </Tab>
+    </Tabs>
+
+    **Verify**
+
+    Create a new chat with the Volink model and send:
+
+    ```text
+    Confirm Volink is connected in one sentence.
+    ```
+
+    **Troubleshooting**
+
+    - **Browser-only deployments:** provider settings may be stored locally — verify the active workspace is using the Volink provider.
+    - **Self-hosted not updating:** a restart is required after environment changes.
+    - **Model discovery fails:** add model IDs manually.
+    - **Feature-specific failures:** test plain chat first; some LobeChat features use provider-specific capabilities.
+  </Accordion>
+
+  <Accordion title="LibreChat">
+    LibreChat routes OpenAI-compatible requests to Volink through a custom endpoint defined in `librechat.yaml`. Keep API keys in `.env` rather than directly in the config file.
+
+    <Steps>
+      <Step title="Configure librechat.yaml">
+        Add a custom endpoint:
+
+        ```yaml
+        version: 1.3.5
+        cache: true
+
+        endpoints:
+          custom:
+            - name: "Volink"
+              apiKey: "${VOLINK_API_KEY}"
+              baseURL: "https://api.volink.org/v1"
+              models:
+                default:
+                  - "your_model_id"
+                fetch: true
+              titleConvo: true
+              titleModel: "your_model_id"
+              modelDisplayLabel: "Volink"
+        ```
+
+        Use `fetch: true` to let LibreChat call `/v1/models`. Use `fetch: false` and list models manually for a curated model selector.
+      </Step>
+      <Step title="Set the environment variable">
+        Add your key to `.env`:
+
+        ```bash
+        VOLINK_API_KEY=your_volink_api_key
+        ```
+      </Step>
+      <Step title="Mount the config in Docker (if applicable)">
+        Make sure `librechat.yaml` is mounted into the API container:
+
+        ```yaml
+        services:
+          api:
+            volumes:
+              - type: bind
+                source: ./librechat.yaml
+                target: /app/librechat.yaml
+        ```
+
+        Then restart LibreChat:
+
+        ```bash
+        docker compose down
+        docker compose up -d
+        ```
+      </Step>
+      <Step title="Verify">
+        Select a Volink model in LibreChat and send:
+
+        ```text
+        Reply with one sentence confirming this model works.
+        ```
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Endpoint not appearing:** check YAML indentation and confirm `librechat.yaml` is mounted.
+    - **Backend not updated:** restart the backend after any provider configuration change.
+    - **Wrong model IDs:** confirm the configured model list uses exact Volink model IDs.
+    - **Tools or plugins failing:** select a model that supports tool calling.
+    - **Using a full `/v1/chat/completions` URL:** set `directEndpoint: true` in the endpoint config.
+    - **Upstream errors:** check LibreChat server logs for Volink status codes.
+  </Accordion>
+
+  <Accordion title="NextChat">
+    NextChat connects to Volink by selecting the OpenAI provider and overriding the base URL.
+
+    <Steps>
+      <Step title="Open settings">
+        Open NextChat settings and choose **OpenAI** as the model provider.
+      </Step>
+      <Step title="Enter Volink credentials">
+        Set:
+
+        - **API key:** your Volink API key
+        - **API base URL:** `https://api.volink.org/v1`
+        - **Model:** a Volink-enabled model ID
+      </Step>
+      <Step title="Add a custom model (if needed)">
+        If the model is not in the default model list, add it manually as a custom model. Some NextChat builds require custom model names to be comma-separated without spaces.
+      </Step>
+      <Step title="Save and verify">
+        Save settings, start a new chat, and send:
+
+        ```text
+        Say that Volink is connected in one short sentence.
+        ```
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Requests still go to OpenAI:** confirm the custom base URL is saved and active.
+    - **Model menu is empty:** add a model ID manually.
+    - **CORS or network errors:** check the deployment's server-side proxy settings.
+    - **Non-OpenAI model hidden by UI:** add it as a custom model rather than relying on the default list.
+  </Accordion>
+
+  <Accordion title="AnythingLLM">
+    AnythingLLM uses Volink as a `Generic OpenAI` LLM provider. Chat and embedding models are configured separately — configure both if you want document chat with RAG.
+
+    <Steps>
+      <Step title="Open LLM settings">
+        Open AnythingLLM, click the settings or wrench icon, then go to **AI Providers** → **LLM**.
+      </Step>
+      <Step title="Select Generic OpenAI">
+        Select **Generic OpenAI** and enter:
+
+        - **Base URL:** `https://api.volink.org/v1`
+        - **API key:** your Volink API key
+        - **Chat model:** a Volink-enabled chat model ID
+      </Step>
+      <Step title="Configure a workspace">
+        Create or open a workspace and choose the configured provider and model for chat.
+      </Step>
+      <Step title="Configure the embedder (optional)">
+        For document chat, also configure the embedding provider:
+
+        1. Go to **AI Providers** → **Embedder**.
+        2. Choose an embedding provider.
+        3. Use a Volink-supported embedding model if available, or configure another embedding provider.
+        4. Upload documents to the workspace and save and embed them before asking questions.
+
+        <Note>Chat can work while document retrieval fails if the LLM provider is configured but the embedder is not.</Note>
+      </Step>
+      <Step title="Verify">
+        Create a workspace chat and send:
+
+        ```text
+        Confirm in one sentence that the LLM connection works.
+        ```
+      </Step>
+    </Steps>
+
+    **Troubleshooting**
+
+    - **Chat and document retrieval are separate:** if document chat fails, check the embedding provider as well as the chat provider.
+    - **Model rejected:** verify the exact model ID in Volink.
+    - **`Chat Model Name` field:** enter the raw Volink model ID, not a display label.
+    - **Responses are short:** adjust the workspace max token setting and confirm the model's output limit.
+  </Accordion>
+
+</AccordionGroup>

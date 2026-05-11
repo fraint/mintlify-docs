@@ -1,0 +1,55 @@
+---
+title: "Volink: Unified AI APIs for Chat, Voice, and Images"
+description: "Volink gives you one API key and one base URL to access OpenAI, Anthropic, Google, DeepSeek, and more. Build with any compatible client or SDK."
+---
+
+Volink is a unified AI gateway that lets you call OpenAI-compatible and Anthropic-compatible APIs — for chat, text-to-speech, and image generation — all through a single API key. Whether you're building with an existing SDK, integrating an AI agent tool, or experimenting in a chat client, Volink routes your requests to the right provider without requiring you to manage multiple credentials.
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Get your API key and make your first call in minutes.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/overview">
+    Explore all endpoints for chat, speech, and image generation.
+  </Card>
+  <Card title="Integrations" icon="puzzle-piece" href="/integrations/ai-agents">
+    Connect Volink to AI agents, chat platforms, and role-play apps.
+  </Card>
+  <Card title="Voice Features" icon="microphone" href="/voice/voice-mix">
+    Create custom voices using mix, text-designed, or cloning techniques.
+  </Card>
+</CardGroup>
+
+## How it works
+
+<Steps>
+  <Step title="Create an account and get your API key">
+    Sign in to your Volink account, navigate to **API Keys** in the sidebar, and create a new key. Copy and store it securely — you won't be able to view it again.
+  </Step>
+  <Step title="Set your environment variables">
+    ```bash
+    export VOLINK_API_KEY="your_api_key"
+    export VOLINK_BASE_URL="https://api.volink.org"
+    ```
+  </Step>
+  <Step title="Call the API with any compatible client">
+    Use `https://api.volink.org` as your base URL with the OpenAI or Anthropic SDK of your choice. The same key works across all protocols.
+  </Step>
+  <Step title="Choose your integration">
+    Use Volink directly via API, or connect it to an AI agent tool like Claude Code, Cursor, or Cline — or a chat platform like LobeChat or OpenWebUI.
+  </Step>
+</Steps>
+
+## Choose your protocol
+
+<CardGroup cols={3}>
+  <Card title="OpenAI Compatible" icon="circle-check" href="/api-reference/chat/openai-completions">
+    Use `/v1/chat/completions` with any OpenAI SDK or client.
+  </Card>
+  <Card title="Anthropic Compatible" icon="circle-check" href="/api-reference/chat/anthropic-messages">
+    Use `/v1/messages` with Claude-style clients and SDKs.
+  </Card>
+  <Card title="Volink Native" icon="circle-check" href="/api-reference/images/volink-images">
+    Access Volink-specific capabilities like chat-based image generation.
+  </Card>
+</CardGroup>
