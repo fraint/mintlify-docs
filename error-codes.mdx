@@ -11,7 +11,7 @@ Volink returns standard HTTP status codes for every API response. When a request
 | --- | --- | --- |
 | `400` | Invalid request | Check the request body format and verify all required fields are present and correctly typed |
 | `401` | Missing or invalid API key | Verify your API key is correct and included in the `Authorization` header as `Bearer YOUR_VOLINK_API_KEY` |
-| `402` | Insufficient quota | Purchase more points via **Top Up** in your account |
+| `402` | Insufficient quota | Click **Top up** in the **Balance** block in the lower-left corner to purchase more points |
 | `403` | Access denied | Your API key does not have access to this model or feature |
 | `404` | Not found | Check the endpoint path and model ID |
 | `429` | Rate limit exceeded | Slow down your request rate or upgrade your plan |
@@ -44,7 +44,7 @@ If you receive an error about `temperature`, the value you provided is outside t
 
 **Voice ID not found (404)**
 
-If a voice request returns a `404`, the voice ID specified in your request does not exist in your account. Open the **Voice** section of the Volink dashboard and confirm that the voice ID is correct and has been created.
+If a voice request returns a `404`, the voice ID specified in your request does not exist in your account. Open the **Voice Models** section of the Volink dashboard and confirm that the voice ID is correct and has been created.
 
 **Text too long (413)**
 
